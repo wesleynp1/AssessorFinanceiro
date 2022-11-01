@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "978157244649",
+    "project_id": "assessorfinanceirownp",
+    "storage_bucket": "assessorfinanceirownp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978157244649:android:c4712c3295de2dc1362078",
+        "android_client_info": {
+          "package_name": "com.assessorfinanceiro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "978157244649-9s5a9qnqj51igh5mb806i9c8j9uuoabi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6mtGaddahoRAutNpRwK7a41hYqXrOc3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "978157244649-9s5a9qnqj51igh5mb806i9c8j9uuoabi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
