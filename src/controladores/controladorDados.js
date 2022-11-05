@@ -1,13 +1,21 @@
+import { resolvePlugin } from "@babel/core";
+import conectorBancoDeDados from "./conectorBancoDeDados.js";
+
 class controladorDados
 {
-    constructor()
+    async getSaldo()
     {
-        this.saldo=2000;
+        return await conectorBancoDeDados.getSaldo();
     }
 
-    getSaldo()
+    async getTransacoes()
     {
-        return this.saldo;
+        return await conectorBancoDeDados.getTransacoes();
+    }
+
+    async inserirTransacao(t)
+    {
+        return await conectorBancoDeDados.inserirTransacao(t);
     }
 }
 
