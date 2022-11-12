@@ -4,12 +4,27 @@ import firestore from '@react-native-firebase/firestore';
 
 const conectorBancoDeDados = 
 {
-     getSaldo: async ()=>{
+    getContas: async ()=>{
+        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").doc("carteira").get()).data().saldo;
+    },
+
+    getSaldo: async ()=>{
         return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").doc("carteira").get()).data().saldo;
     },
 
     getTransacoes: async ()=>{
-        return await firestore().collection("usuarios").doc("wesleynp").collection("transacoes").orderBy("data","desc").get().then(q => { return q.docs.map(r => r.data())});
+        return await firestore()
+                    .collection("usuarios")
+                    .doc("wesleynp")
+                    .collection("transacoes")
+                    .orderBy("data","desc")
+                    .get().then(q => { 
+                        return q.docs.map(r => {
+                            t = r.data();
+                            t.id= r.id;
+                            return t;
+                        })
+                    });
     },
 
     inserirTransacao: async (t)=>{
@@ -30,7 +45,7 @@ const conectorBancoDeDados =
     },
 
     excluirInformacoes: (id)=>{
-        return firestore().collection("produtos").doc(id).delete();        
+        return firestore().collection("usuarios").doc("wesleynp").collection("transacoes").doc(id).delete();        
     }    
 }
 
