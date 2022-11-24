@@ -1,25 +1,23 @@
-import { View,Text, Button } from "react-native";
-import firestore from '@react-native-firebase/firestore';
+import { View,Text} from "react-native";
 import FormularioTransacao from "../FormularioTransacao";
 
-const PaginaNovaTransacao = ({novaTransacao})=>{
-    let t = {   categoria:"mercado",
-                conta: firestore().doc("usuarios/wesleynp/contas/carteira"),
-                data:new Date(2022,0,3),
-                valor:-30};
-
+const PaginaNovaTransacao = ({novaTransacao, contas, eDespesa})=>{
+    
     let transacaoInicial = {categoria:"",
-                            conta:"carteira",
-                            data: new Date().toDateString(),
+                            conta: contas[0],
+                            data: new Date(),
                             valor:0}
     
 
     return(
         <View>
-            <Text>em construção...</Text>
-            <Button onPress={()=>{novaTransacao(t);}} title={"testa add transacao"}/>
+            <Text style={{color:(eDespesa ? "red" : "green"),fontSize:16, margin: 10, textAlign:"center"}}>
+                INSIRA AS INFORMAÇÕES DA NOVA {(eDespesa ? "DESPESA" : "RECEITA")}
+            </Text>
 
             <FormularioTransacao    transacaoInicial={transacaoInicial} 
+                                    contas={contas}
+                                    eDespesa={eDespesa}
                                     aoSubmeter={tr=>{novaTransacao(tr)}}/>
         </View>
     );

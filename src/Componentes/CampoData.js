@@ -3,48 +3,43 @@ import { TextInput,StyleSheet} from "react-native";
 
 //Ideia de componente encapsulado que corrige e filtra entradas do usuário retornando o valor "data"
 
-const filtrarCaracteres = (texto)=>{
+const filtrarCaracteres = (texto)=>{ //retorna um texto apenas com numeros a partir do texto fornecido
     return  Array.from(texto)
             .filter(c =>"0123456789".includes(c))//caracteres permitidos
             .join("");    
 }
 
-const textoParaNumero = (textoDigitado)=>{ //retorna uma data em número compreensível à máquina
+const textoParaDate = (textoDigitado)=>{ //retorna um objeto Date a partir de um texto(DD/MM/AAAA)
     let textoFiltrado = filtrarCaracteres(textoDigitado);
 
     if(textoFiltrado.length>=8)
     {
+        console.log("string: "+textoFiltrado.substring(0,2));
+        
 
-        let dia = textoFiltrado.substring(0,2);
-        let mes = textoFiltrado.substring(2,4);
-        let ano = textoFiltrado.substring(4,8);
+        let dia = parseInt(textoFiltrado.substring(0,2));
+        let mes = parseInt(textoFiltrado.substring(2,4))-1;
+        let ano = parseInt(textoFiltrado.substring(4,8));
+
+        console.log("let dia:"+dia);
+        console.log(new Date(ano,mes,dia))
 
         // D D M M A A A A
         //0 1 2 3 4 5 6 7 8
 
-        return parseInt(ano + mes + dia);
+        return new Date(ano,mes,dia)
     }
     else
     {
-        return parseInt(textoFiltrado);
+        return new Date();
     }
 }
 
-export const numeroParaData = (numero)=>{ //retorna uma data compreensível ao usuário e formatado
-    
-    texto = numero.toString();
-
-    let ano = texto.substring(0,4);
-    let mes = texto.substring(4,6);
-    let dia = texto.substring(6,8);
-
-    // A A A A M M D D
-    //0 1 2 3 4 5 6 7 8
-
-    return dia+"/"+mes+"/"+ano
+export const dateParaTexto = (d)=>{ //retorna um texto(DD/MM/AAAA) a partir de um objeto Date
+        return ("0"+d.getDate()).slice(-2) +"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear();
 }
 
-const textoParaData = (textoDigitado)=>{//retorna a data digitada pelo user formatada
+const formataTextoDDMMAAAA = (textoDigitado)=>{//retorna um texto em DD/MM/AAAA a partir de um texto fornecido
 
     let textoFiltrado = filtrarCaracteres(textoDigitado);
 
@@ -66,19 +61,6 @@ const textoParaData = (textoDigitado)=>{//retorna a data digitada pelo user form
     }
 }
 
-export const DataDeHojeEmNumero = ()=>{//retorna a data de hoje compreensível ao usuário e formatada
-    let dataDeHoje = new Date();
-
-    let ano = dataDeHoje.getFullYear().toString(); 
-    let mes = (dataDeHoje.getMonth()+1).toString();
-    let dia = dataDeHoje.getDate().toString();
-    
-    if(dia.length==1)dia = "0"+dia;
-    if(mes.length==1)mes = "0"+ mes;
-    
-    return parseInt(ano+mes+dia);
-}
-
 export const validarData = (data)=>{
     if(data.toString().length!=8)return false;
 
@@ -98,36 +80,22 @@ export const validarData = (data)=>{
     return anoOk && mesOk && diaOk;
 }
 
-export default CampoData = ({aoMudarTexto,
-                             valorInicial,
-                             referencia=()=>{}})=> {
-    const [valor, setValor] = useState(numeroParaData(valorInicial));
+const CampoData = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}})=> {
+    const [valor, setValor] = useState(dateParaTexto(valorInicial));
 
     return(
-    <TextInput  style={estilo.Campos} 
+    <TextInput  style={estilo} 
                 placeholderTextColor="gray"
-                placeholder="Informe a data(opcional)..."
+                placeholder="Informe a data..."
                 value={valor}
                 keyboardType="number-pad"
                 onChangeText={t =>{
-                    setValor(textoParaData(t)); // o que usuário vai ver
-                    aoMudarTexto(textoParaNumero(t)); // o que o aplicativo vai ver
+                    setValor(formataTextoDDMMAAAA(t)); // o que usuário vai ver
+                    aoMudarTexto(textoParaDate(t)); // o que o aplicativo vai ver
                 }}
                 ref={r=>{referencia(r)}}
                 />
     );
 }
 
-const estilo = StyleSheet.create({
-    Campos:{
-        fontSize: 12,
-        color:"black",
-        textAlign:"center",
-        borderColor:"black",
-        borderStyle:"solid",
-        borderWidth:2,
-        margin:10,
-        padding: 2
-    }
-})
-
+export default CampoData;

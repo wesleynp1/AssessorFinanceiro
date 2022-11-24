@@ -5,7 +5,7 @@ import firestore from '@react-native-firebase/firestore';
 const conectorBancoDeDados = 
 {
     getContas: async ()=>{
-        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").doc("carteira").get()).data().saldo;
+        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").get().then(q => q.docs.map(d => d.id)));
     },
 
     getSaldo: async ()=>{
@@ -20,31 +20,31 @@ const conectorBancoDeDados =
                     .orderBy("data","desc")
                     .get().then(q => { 
                         return q.docs.map(r => {
-                            t = r.data();
+                            let t = r.data();
                             t.id= r.id;
+                            t.data= r.data().data.toDate();
+                            t.conta= r.data().conta._documentPath._parts[3]
                             return t;
                         })
                     });
     },
 
     inserirTransacao: async (t)=>{
+        t.conta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
         return await firestore().collection("usuarios").doc("wesleynp").collection("transacoes").add(t);
     },
 
-    alterarinformacoes: (produtoAtualizado)=>{
-        return new Promise(resolve =>{
-            firestore().collection("produtos").doc(produtoAtualizado.id)
-            .update({
-                "nome":produtoAtualizado.nome,
-                "loja":produtoAtualizado.loja,
-                "preco":produtoAtualizado.preco,
-                "data":produtoAtualizado.data,
+    atualizarTransacao: async (t)=>{
+        return await firestore().collection("usuarios").doc("wesleynp").collection("transacoes").doc(t.id).update({
+                "categoria":t.categoria,
+                "data":t.data,
+                "valor":t.valor,
+                "conta":firestore().doc("usuarios/wesleynp/contas/"+t.conta),
                 })
-                .then(()=>resolve())
-        })
+        
     },
 
-    excluirInformacoes: (id)=>{
+    excluirTransacao: (id)=>{
         return firestore().collection("usuarios").doc("wesleynp").collection("transacoes").doc(id).delete();        
     }    
 }

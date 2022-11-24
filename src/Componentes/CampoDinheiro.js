@@ -4,6 +4,7 @@ import { View,TextInput,StyleSheet } from "react-native";
 const CampoDinheiro = ({valorInicial, //valor inicial em centavos inteiros
                         aoMudarTexto, //ação ao usuário digitar
                         borrarAoSubmeter, // se for o último campo {true} senão {false}
+                        estilo,
                         aoTerminarDigitar=()=>{}, //o que fazer quando o user dar submit no campo
                         referencia=()=>{} // executa uma ação com o ref se necessário
                         })=>{
@@ -12,7 +13,7 @@ const CampoDinheiro = ({valorInicial, //valor inicial em centavos inteiros
 
     return(
         <View>
-            <TextInput  style={estilo.Campos} 
+            <TextInput  style={estilo} 
                         value={valor}
                         placeholderTextColor="gray"
                         placeholder="Digite quanto ele custa..."
@@ -38,22 +39,24 @@ const filtrarCaracteres = (texto) =>{
 
 export const inteiroParaReal = (numero)=>{
 
-    if(numero<10) //1 algarismo
+    let n = Math.abs(numero);    
+
+    if(n<10) //1 algarismo
     {
-        return "R$ 0,0" + numero.toString();
+        return "R$ 0,0" + n.toString();
     }
     else
-    if(numero<100) //2 algarismos
+    if(n<100) //2 algarismos
     {
-        return "R$ 0," + numero.toString();
+        return "R$ 0," + n.toString();
     }
     else//3 ou mais algarismos
     {
-        let caracteres = Array.from(numero.toString())
+        let caracteres = Array.from(n.toString())
 
         let centavos = caracteres.slice(-2).join('');// 2 últimos caracteres
         let reais = caracteres.slice(0,caracteres.length-2).join('');//tudo menos os 2 últimos caracteres
-
+        
         return "R$ " + reais + "," + centavos;
     }
 }
@@ -68,18 +71,5 @@ const TextoParaInteiro = (texto)=>{
         return parseInt(textoFiltrado);
     }       
 }
-
-const estilo = StyleSheet.create({
-    Campos:{
-        fontSize: 12,
-        color:"black",
-        textAlign:"center",
-        borderColor:"black",
-        borderStyle:"solid",
-        borderWidth:2,
-        margin:10,
-        padding: 2
-    }
-})
 
 export default CampoDinheiro;
