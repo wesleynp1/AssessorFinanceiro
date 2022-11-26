@@ -26,7 +26,6 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
 
     const aoPressionarRegistrar = ()=>{
         let sePostivo = ()=> {aoSubmeter({
-            id:transacaoInicial.id,
             categoria:categoria,
             data: new Date(data), 
             conta: conta,

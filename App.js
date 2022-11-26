@@ -15,7 +15,7 @@ export default class App extends Component{
   constructor(){
     super();
  
-    this.state = {saldoTotal:"?",transacoes:[],contas:[],carregando:true};
+    this.state = {transacoes:[],contas:[],carregando:true};
     
     this.cd = new controladorDados();
 
@@ -26,13 +26,11 @@ export default class App extends Component{
   {
     this.setState({carregando:true})
 
-    this.cd.getContas().then(c => this.setState({contas:c}));
-
-    let saldo,transacoes;
-    let atualizaState = ()=>{this.setState({saldoTotal:saldo,transacoes:transacoes, carregando: false})}
+    let contas,transacoes;
+    let atualizaState = ()=>{this.setState({contas:contas, transacoes:transacoes, carregando:false})}
     
-    this.cd.getSaldo().then(r =>{saldo=r;if(transacoes!=undefined)atualizaState();});
-    this.cd.getTransacoes().then(t =>{transacoes=t;if(saldo!=undefined)atualizaState();});
+    this.cd.getContas().then(c => {contas = c;if(transacoes!=undefined)atualizaState();});
+    this.cd.getTransacoes().then(t =>{transacoes=t;if(contas!=undefined)atualizaState();});
   }
 
   componentDidMount()
@@ -59,8 +57,7 @@ export default class App extends Component{
         <STACK.Screen name='Inicial' options={{title:"Primeira Página"}}>
         {({navigation})=>{
             return (
-            <PaginaInicial  saldoTotal={this.state.saldoTotal}  
-                            transacoes={this.state.transacoes}
+            <PaginaInicial  transacoes={this.state.transacoes}
                             contas={this.state.contas}
                             
                             irParaPaginaNovaTransacao={(d)=>{navigation.navigate("PaginaNovaTransacao",{eDespesa: d})}} //método para navegar nas páginas
@@ -75,7 +72,7 @@ export default class App extends Component{
         {({route})=>{
             return (
             <PaginaNovaTransacao novaTransacao={t =>{this.cd.inserirTransacao(t).then(()=>{this.atualizarSaldoTransacoes()})}}
-                                 contas={this.state.contas}
+                                 nomeContas={this.state.contas.map(d => d.id)}
                                  eDespesa={route.params.eDespesa}
             />
             );
@@ -86,7 +83,7 @@ export default class App extends Component{
         {({route})=>{
             return (
             <PaginaEditarTransacao atualizarTransacao={t =>{this.cd.atualizarTransacao(t).then(()=>{this.atualizarSaldoTransacoes()})}}
-                                   contas={this.state.contas}
+                                   nomeContas={this.state.contas.map(d => d.id)}
                                    transacaoInicial={route.params.transacao}
             />
             );

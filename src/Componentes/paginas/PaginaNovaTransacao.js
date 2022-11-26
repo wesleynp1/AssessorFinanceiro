@@ -1,10 +1,10 @@
 import { View,Text} from "react-native";
 import FormularioTransacao from "../FormularioTransacao";
 
-const PaginaNovaTransacao = ({novaTransacao, contas, eDespesa})=>{
+const PaginaNovaTransacao = ({novaTransacao, nomeContas, eDespesa})=>{
     
     let transacaoInicial = {categoria:"",
-                            conta: contas[0],
+                            conta: nomeContas[0],
                             data: new Date(),
                             valor:0}
     
@@ -16,7 +16,7 @@ const PaginaNovaTransacao = ({novaTransacao, contas, eDespesa})=>{
             </Text>
 
             <FormularioTransacao    transacaoInicial={transacaoInicial} 
-                                    contas={contas}
+                                    contas={nomeContas}
                                     eDespesa={eDespesa}
                                     aoSubmeter={tr=>{novaTransacao(tr)}}/>
         </View>

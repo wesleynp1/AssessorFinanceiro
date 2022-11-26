@@ -3,8 +3,13 @@ import FormularioTransacao from "../FormularioTransacao";
 import {Picker} from '@react-native-picker/picker';
 import { useState } from "react";
 
-const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, contas})=>{
+const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas})=>{
     const [eDespesa,seteDespesa] = useState(transacaoInicial.valor<0 ? true : false);
+
+    const aoSubmenter = (t)=>{
+        t.id = transacaoInicial.id;
+        atualizarTransacao(t);
+    }
 
     return(
         <View>
@@ -24,9 +29,9 @@ const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, contas})=>{
             </Picker>
 
             <FormularioTransacao    transacaoInicial={transacaoInicial} 
-                                    contas={contas}
+                                    contas={nomeContas}
                                     eDespesa={eDespesa}
-                                    aoSubmeter={tr=>{atualizarTransacao(tr)}}/>
+                                    aoSubmeter={aoSubmenter}/>
         </View>
     );
 }

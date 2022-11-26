@@ -5,7 +5,15 @@ import firestore from '@react-native-firebase/firestore';
 const conectorBancoDeDados = 
 {
     getContas: async ()=>{
-        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").get().then(q => q.docs.map(d => d.id)));
+        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").get()
+        .then(q => {
+            return(q.docs.map(c=>{
+                let contas = c.data();
+                contas.id = c.id;
+
+                return contas
+            })
+        )}));
     },
 
     getSaldo: async ()=>{
@@ -31,6 +39,8 @@ const conectorBancoDeDados =
 
     inserirTransacao: async (t)=>{
         t.conta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
+        console.log(t);
+
         return await firestore().collection("usuarios").doc("wesleynp").collection("transacoes").add(t);
     },
 
