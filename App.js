@@ -52,7 +52,7 @@ export default class App extends Component{
 
     return(
     <NavigationContainer>
-      <STACK.Navigator initialRouteName='Inicial'>
+      <STACK.Navigator initialRouteName='Inicial' screenOptions={{headerShown: false}}>
 
         <STACK.Screen name='Inicial' options={{title:"Primeira Página"}}>
         {({navigation})=>{

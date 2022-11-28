@@ -16,10 +16,6 @@ const conectorBancoDeDados =
         )}));
     },
 
-    getSaldo: async ()=>{
-        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").doc("carteira").get()).data().saldo;
-    },
-
     getTransacoes: async ()=>{
         return await firestore()
                     .collection("usuarios")
