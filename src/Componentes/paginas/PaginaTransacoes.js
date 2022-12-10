@@ -8,7 +8,7 @@ import {inteiroParaReal} from "../CampoDinheiro"
 import estatistica from "../../controladores/estatistica.js";
 
 
-const PaginaInicial = ({irParaPaginaNovaTransacao, irParaPaginaEditarTransacao, transacoes, contas, excluirTransacao})=>{
+const PaginaTransacoes = ({irParaPaginaNovaTransacao, irParaPaginaEditarTransacao, transacoes, contas, excluirTransacao})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
 
@@ -49,8 +49,6 @@ const PaginaInicial = ({irParaPaginaNovaTransacao, irParaPaginaEditarTransacao, 
                 <Text style={{color:'#007700',textAlign:'center'}}>RECEITA DO MÊS: {receita}</Text>
                 <Text style={{color:'#770000',textAlign:'center'}}>DESPESA DO MÊS: {despesa}</Text>
                 <Text style={{color:(balancoNegativo ? "#FF0000" : '#000077'),textAlign:'center'}}>BALANÇO DO MÊS: {balanco}</Text>
-
-                <Text style={{color:'#000077',textAlign:'center'}}>NÚMERO DE TRANSAÇÕES: {transacoesDoMes.length}</Text>
                 
                 <Button onPress={()=>irParaPaginaNovaTransacao(false)} color="green" title={"registrar nova receita"}/> 
                 <Button onPress={()=>irParaPaginaNovaTransacao(true)} color="red"  title={"registrar nova despesa"}/>                            
@@ -67,4 +65,4 @@ const PaginaInicial = ({irParaPaginaNovaTransacao, irParaPaginaEditarTransacao, 
     );
 }
 
-export default PaginaInicial
+export default PaginaTransacoes

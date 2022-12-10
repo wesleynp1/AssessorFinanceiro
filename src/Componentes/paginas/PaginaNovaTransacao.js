@@ -15,10 +15,11 @@ const PaginaNovaTransacao = ({novaTransacao, nomeContas, eDespesa})=>{
                 INSIRA AS INFORMAÇÕES DA NOVA {(eDespesa ? "DESPESA" : "RECEITA")}
             </Text>
 
-            <FormularioTransacao    transacaoInicial={transacaoInicial} 
-                                    contas={nomeContas}
-                                    eDespesa={eDespesa}
-                                    aoSubmeter={tr=>{novaTransacao(tr)}}/>
+            <FormularioTransacao    
+            transacaoInicial={transacaoInicial} 
+            contas={nomeContas}
+            eDespesa={eDespesa}
+            aoSubmeter={tr=>{novaTransacao(tr)}}/>
         </View>
     );
 }
