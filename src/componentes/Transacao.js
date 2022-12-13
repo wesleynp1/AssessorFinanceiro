@@ -6,10 +6,8 @@ import {dateParaTexto} from "./CampoData";
 const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
 
     let v = inteiroParaReal(transacao.valor)
-    v= transacao.valor<0 ? v.replace("R$ ","R$ -") : v.replace("R$ ","R$ +");
 
-    const ConfirmarExcluirTransacao = ()=>
-        {
+    const ConfirmarExcluirTransacao = ()=>{
             Alert.alert(
                 "Exclusão de Valor",
                 "Tem certeza que deseja excluir esta transação: categoria" + transacao.categoria + "?",

@@ -5,11 +5,13 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ActivityIndicator, View,Text } from 'react-native';
 
 //PÁGINAS TRANSAÇÃO
-import PaginaTransacoes from './src/Componentes/paginas/PaginaTransacoes';
-import PaginaNovaTransacao from './src/Componentes/paginas/PaginaNovaTransacao';
-import PaginaEditarTransacao from './src/Componentes/paginas/PaginaEditarTransacao';
+import PaginaTransacoes from './src/componentes/paginas/PaginaTransacoes';
+import PaginaNovaTransacao from './src/componentes/paginas/PaginaNovaTransacao';
+import PaginaEditarTransacao from './src/componentes/paginas/PaginaEditarTransacao';
 
-import PaginaContas from './src/Componentes/paginas/PaginaContas';
+import PaginaContas from './src/componentes/paginas/PaginaContas';
+
+import PaginaEstatistica from './src/componentes/paginas/PaginaEstatisticas';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
 
@@ -104,7 +106,16 @@ export default class App extends Component{
     //PAGINAS DE CRUD DE CONTAS
     let AbaContas = () => {
       return(
-        <PaginaContas contas={this.state.contas}/>
+        <PaginaContas 
+          contas={this.state.contas}
+          transacoes={this.state.transacoes}/>
+      )
+    }
+
+    //PÁGINA ESTATISTICA
+    let AbaEstatistica = ()=> {
+      return(
+        <PaginaEstatistica transacoes={this.state.transacoes}/>
       )
     }
 
@@ -115,6 +126,7 @@ export default class App extends Component{
           <TAB.Navigator initialRouteName='transacoes' screenOptions={{headerShown: false}}>
             <TAB.Screen name='transacoes' component={AbaTransacoes}/>
             <TAB.Screen name='contas' component={AbaContas}/>
+            <TAB.Screen name='estatistica' component={AbaEstatistica}/>
           </TAB.Navigator>
         </NavigationContainer>
       );

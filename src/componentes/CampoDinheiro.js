@@ -39,16 +39,18 @@ const filtrarCaracteres = (texto) =>{
 
 export const inteiroParaReal = (numero)=>{
 
-    let n = Math.abs(numero);    
+    let n = Math.abs(numero);
+
+    let rs = numero>=0 ? "R$ " : "R$ -";
 
     if(n<10) //1 algarismo
     {
-        return "R$ 0,0" + n.toString();
+        return rs + "0,0" + n.toString();
     }
     else
     if(n<100) //2 algarismos
     {
-        return "R$ 0," + n.toString();
+        return rs + "0," + n.toString();
     }
     else//3 ou mais algarismos
     {
@@ -57,7 +59,7 @@ export const inteiroParaReal = (numero)=>{
         let centavos = caracteres.slice(-2).join('');// 2 últimos caracteres
         let reais = caracteres.slice(0,caracteres.length-2).join('');//tudo menos os 2 últimos caracteres
         
-        return "R$ " + reais + "," + centavos;
+        return rs + reais + "," + centavos;
     }
 }
 

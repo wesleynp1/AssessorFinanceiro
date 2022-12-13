@@ -1,7 +1,8 @@
 import { View,Text,SafeAreaView, FlatList, StyleSheet } from "react-native";
-import {inteiroParaReal} from "../CampoDinheiro"
+import {inteiroParaReal} from "../CampoDinheiro";
+import estatistica from "../../controladores/estatistica.js";
 
-const PaginaContas = ({contas})=>{
+const PaginaContas = ({contas, transacoes})=>{
 
     let saldoTotal = 0
     contas.forEach(c =>{saldoTotal+=c.saldo});
@@ -11,7 +12,7 @@ const PaginaContas = ({contas})=>{
             <View style={estilo.Quadro}>
                 <Text style={estilo.Texto}>
                     {item.id} {"\n"}
-                    saldo: {inteiroParaReal(item.saldo)}
+                    saldo: {inteiroParaReal(item.saldo)} 
                 </Text>
             </View>
         )
@@ -19,7 +20,7 @@ const PaginaContas = ({contas})=>{
 
     return(
         <View style={estilo.Pagina}>
-            <Text style={{color:'#000000',textAlign:'center'}}>CONTAS</Text>
+            <Text style={estilo.Titulo}>CONTAS</Text>
 
             <SafeAreaView>
                 <FlatList 
@@ -40,6 +41,11 @@ let estilo = StyleSheet.create({
         Pagina:{
             padding: 16
         },
+        Titulo:{
+            fontSize: 24,
+            color:"black",
+            textAlign:'center'
+        },  
         Texto:{
             fontSize: 15,
             color:"black",
@@ -52,5 +58,5 @@ let estilo = StyleSheet.create({
             borderColor:"black",
             borderStyle:"solid",
             borderWidth:2,
-        }
+        },
     });

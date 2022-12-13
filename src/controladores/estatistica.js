@@ -1,11 +1,12 @@
-export default estatistica = {
+const estatistica = {
+
     getSaldoTotal:(contas)=>{
         let totalEmContas = 0;
         contas.map(c => {totalEmContas+=c.saldo});        
         return totalEmContas
     },
 
-    getReceita:(transacoes,mesSelecionado)=>{
+    getReceita:(transacoes)=>{
         let receitaTotal = 0;
         
         transacoes.forEach(t =>{if(t.valor>0)receitaTotal+=t.valor});
@@ -13,7 +14,7 @@ export default estatistica = {
         return receitaTotal;
     },
     
-    getDespesa:(transacoes,mesesSelecionado)=>{
+    getDespesa:(transacoes)=>{
         let despesaTotal = 0;
         
         transacoes.forEach(t =>{if(t.valor<0)despesaTotal+=t.valor});
@@ -21,11 +22,31 @@ export default estatistica = {
         return despesaTotal;
     },
     
-    getBalanco:(transacoes,mesesSelecionado)=>{
+    getBalanco:(transacoes)=>{
         let balanco = 0;
         
         transacoes.forEach(t =>{balanco+=t.valor});
         
         return balanco;
+    },
+
+    getCategorias:(transacoes)=>{
+        let categorias = transacoes.map(t => t.categoria);
+        return categorias.filter((c, index)=>{return categorias.indexOf(c) == index;})
+    },
+
+    getValorPorCategorias:(transacoes)=>{
+        let categorias = estatistica.getCategorias(transacoes);
+
+        let valorPorCategoria = categorias.map(c =>{
+            let valorDaCategoria = 0;
+            transacoes.forEach(t => {if(t.categoria==c)valorDaCategoria+=t.valor })
+            return {categoria: c,valor: valorDaCategoria}
+        })
+
+        return valorPorCategoria;
     }
+
 }
+
+export default estatistica
