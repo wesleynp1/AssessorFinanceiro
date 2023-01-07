@@ -42,7 +42,7 @@ const estatistica = {
             let valorDaCategoria = 0;
             transacoes.forEach(t => {if(t.categoria==c)valorDaCategoria+=t.valor })
             return {categoria: c,valor: valorDaCategoria}
-        })
+        }).sort((a,b)=> (a.valor<0 && b.valor<0) ? (a.valor>b.valor) : (a.valor<b.valor));
 
         return valorPorCategoria;
     }

@@ -1,28 +1,22 @@
 import React,{useState} from "react";
-import { TextInput,StyleSheet} from "react-native";
+import {TextInput} from "react-native";
 
 //Ideia de componente encapsulado que corrige e filtra entradas do usuário retornando o valor "data"
 
 const filtrarCaracteres = (texto)=>{ //retorna um texto apenas com numeros a partir do texto fornecido
     return  Array.from(texto)
             .filter(c =>"0123456789".includes(c))//caracteres permitidos
-            .join("");    
+            .join("");
 }
 
-const textoParaDate = (textoDigitado)=>{ //retorna um objeto Date a partir de um texto(DD/MM/AAAA)
+const textoParaDate = (textoDigitado)=>{ //retorna um objeto Date a partir de um texto(DD/MM/AAAA)  
     let textoFiltrado = filtrarCaracteres(textoDigitado);
 
     if(textoFiltrado.length>=8)
     {
-        console.log("string: "+textoFiltrado.substring(0,2));
-        
-
         let dia = parseInt(textoFiltrado.substring(0,2));
         let mes = parseInt(textoFiltrado.substring(2,4))-1;
         let ano = parseInt(textoFiltrado.substring(4,8));
-
-        console.log("let dia:"+dia);
-        console.log(new Date(ano,mes,dia))
 
         // D D M M A A A A
         //0 1 2 3 4 5 6 7 8
@@ -44,8 +38,7 @@ const formataTextoDDMMAAAA = (textoDigitado)=>{//retorna um texto em DD/MM/AAAA 
     let textoFiltrado = filtrarCaracteres(textoDigitado);
 
     if(textoFiltrado.length>=8)
-    {
-
+    { 
     let dia = textoFiltrado.substring(0,2);
     let mes = textoFiltrado.substring(2,4);
     let ano = textoFiltrado.substring(4,8);
@@ -84,17 +77,19 @@ const CampoData = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}})=> {
     const [valor, setValor] = useState(dateParaTexto(valorInicial));
 
     return(
-    <TextInput  style={estilo} 
-                placeholderTextColor="gray"
-                placeholder="Informe a data..."
-                value={valor}
-                keyboardType="number-pad"
-                onChangeText={t =>{
-                    setValor(formataTextoDDMMAAAA(t)); // o que usuário vai ver
-                    aoMudarTexto(textoParaDate(t)); // o que o aplicativo vai ver
-                }}
-                ref={r=>{referencia(r)}}
-                />
+    <TextInput  
+        maxLength={10}
+        style={estilo} 
+        placeholderTextColor="gray"
+        placeholder="Informe a data..."
+        value={valor}
+        keyboardType="number-pad"
+        onChangeText={t =>{
+            setValor(formataTextoDDMMAAAA(t)); // o que usuário vai ver
+            aoMudarTexto(textoParaDate(t)); // o que o aplicativo vai ver
+        }}
+        ref={r=>{referencia(r)}}
+        />
     );
 }
 

@@ -6,13 +6,15 @@ const conectorBancoDeDados =
 {
     getContas: async ()=>{
         return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").get()
-        .then(q => {
-            return(q.docs.map(c=>{
-                let contas = c.data();
-                contas.id = c.id;
-                return contas
+            .then(q => {
+                return(q.docs.map(c=>{
+                    let contas = c.data();
+                    contas.id = c.id;
+                    return contas
+                }))
             })
-        )}));
+            .catch(e=>{alert("Erro de leitura dos dados:"+e)})
+        );
     },
 
     //CRUD TRANSAÇÕES
@@ -22,7 +24,8 @@ const conectorBancoDeDados =
                     .doc("wesleynp")
                     .collection("transacoes")
                     .orderBy("data","desc")
-                    .get().then(q => { 
+                    .get()
+                    .then(q => { 
                         return q.docs.map(r => {
                             let t = r.data();
                             t.id= r.id;
@@ -30,62 +33,52 @@ const conectorBancoDeDados =
                             t.conta= r.data().conta._documentPath._parts[3]
                             return t;
                         })
-                    });
+                    })
+                    .catch(e=>{alert("Erro de leitura dos dados"+e)});
     },
 
-    inserirTransacao: async (t)=>{      
+    inserirTransacao: async (t)=>{
 
         return await firestore().runTransaction(async tr => {
             t.conta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
-
-            //ADICIONA A TRANSAÇÃO
-            await firestore()
-            .collection("usuarios")
-            .doc("wesleynp")
-            .collection("transacoes")
-            .add(t);
-            
+            let TransacaoRef = firestore().collection("usuarios/wesleynp/transacoes").doc();
+            await tr.set(TransacaoRef,t);            
             const estadoAtualConta =  await tr.get(t.conta);
-
             tr.update(t.conta,{saldo: estadoAtualConta.data().saldo+t.valor})
         })
+        .then(()=>{alert("Transação adicionada com sucesso!")})
+        .catch(()=>{alert("Erro ao adicionar transacao")})
     },
 
     atualizarTransacao: async (t)=>{
         return await firestore().runTransaction(async tr =>{
+            //LEITURAS
             let referenciaTransacao = firestore().doc("usuarios/wesleynp/transacoes/"+t.id);
-            let referenciaConta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
-
+            let referenciaNovaConta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
+            
             let transacaoAtual = await tr.get(referenciaTransacao);
+            let referenciaContaAntiga = transacaoAtual.data().conta;
+            let contaAntiga = await tr.get(referenciaContaAntiga);
+            let contaNova = await tr.get(referenciaNovaConta);
 
-            if(transacaoAtual.data().valor!=t.valor)
-            {
-                let contaAtual = await tr.get(referenciaConta);
-                let diferencaDeValor = transacaoAtual.data().valor-t.valor
+            //ESCRITAS
+            tr.update(
+                referenciaContaAntiga,{
+                saldo: contaAntiga.data().saldo - transacaoAtual.data().valor});
 
-                tr.update(referenciaConta,{saldo: contaAtual.data().saldo - diferencaDeValor})
-            }
+            tr.update(referenciaNovaConta,{
+                saldo: contaNova.data().saldo + t.valor})
 
             tr.update(referenciaTransacao,{
                 categoria: t.categoria,
                 data: t.data,
                 valor: t.valor,
-                conta: referenciaConta
+                conta: referenciaNovaConta
                 })
             
         })
-
-        /*return await firestore()
-        .collection("usuarios")
-        .doc("wesleynp")
-        .collection("transacoes")
-        .doc(t.id)
-        .update({
-                "categoria":t.categoria,
-                "data":t.data,
-                "valor":t.valor,
-                "conta":firestore().doc("usuarios/wesleynp/contas/"+t.conta),
-                })*/
+        .then(()=>{alert("Transação atualizada com sucesso!")})
+        .catch(()=>{alert("Erro ao atualizar a transacao")})
         
     },
 
@@ -103,6 +96,8 @@ const conectorBancoDeDados =
             tr.update(referenciaConta,{saldo: conta.data().saldo-transacaoParaExluir.data().valor})
             tr.delete(referenciaTransacaoParaExcluir);
         })
+        .then(()=>{alert("Transação excluida com sucesso!")})
+        .catch(()=>{alert("Erro ao excluir a transacao")})
     }    
 }
 
