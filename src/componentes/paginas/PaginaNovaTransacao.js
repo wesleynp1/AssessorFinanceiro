@@ -1,5 +1,6 @@
-import { View,Text} from "react-native";
+import { View,Text, Alert} from "react-native";
 import FormularioTransacao from "../FormularioTransacao";
+import { inteiroParaReal } from "../CampoDinheiro";
 
 const PaginaNovaTransacao = ({novaTransacao, nomeContas, eDespesa})=>{
     
@@ -7,6 +8,28 @@ const PaginaNovaTransacao = ({novaTransacao, nomeContas, eDespesa})=>{
                             conta: nomeContas[0],
                             data: new Date(),
                             valor:0}
+
+    const ConfirmarRegistrarTransacao = (tr)=>{
+            Alert.alert(
+                "Adicionar Transação",
+                "Registrar a " + (eDespesa ? "despesa" : "receita") + 
+                " de "+ inteiroParaReal(tr.valor) + "(" + tr.conta + ")" +
+                " em "+ 
+                ("0"+tr.data.getDate()).slice(-2) + "/" + 
+                ("0"+(tr.data.getMonth()+1)).slice(-2) +"/" +
+                (tr.data.getFullYear()) +
+                " da categoria " + tr.categoria + "?",
+                [
+                    {
+                        text:"Cancelar"
+                    },
+                    {
+                        text:"Registrar",
+                        onPress: ()=> novaTransacao(tr)
+                    }
+                ]
+                );
+        }
     
 
     return(
@@ -19,7 +42,7 @@ const PaginaNovaTransacao = ({novaTransacao, nomeContas, eDespesa})=>{
             transacaoInicial={transacaoInicial} 
             contas={nomeContas}
             eDespesa={eDespesa}
-            aoSubmeter={tr=>{novaTransacao(tr)}}/>
+            aoSubmeter={tr=>{ConfirmarRegistrarTransacao(tr)}}/>
         </View>
     );
 }

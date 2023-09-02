@@ -21,7 +21,11 @@ const mesesDoAno = [
     "Novembro", 
     "Dezembro"]
 
-const PaginaTransacoes = ({irParaPaginaNovaTransacao, irParaPaginaEditarTransacao, transacoes, contas, excluirTransacao})=>{
+const PaginaTransacoes = ({
+    irParaPaginaNovaTransacao, 
+    irParaPaginaEditarTransacao, 
+    transacoes, 
+    excluirTransacao})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
 

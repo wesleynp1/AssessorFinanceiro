@@ -9,8 +9,9 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
 
     const ConfirmarExcluirTransacao = ()=>{
             Alert.alert(
-                "Exclusão de Valor",
-                "Tem certeza que deseja excluir esta transação: categoria" + transacao.categoria + "?",
+                "Exclusão de Transação",
+                "Tem certeza que deseja excluir esta transação da categoria " + 
+                transacao.categoria + "?",
                 [
                     {
                         text:"Cancelar"
@@ -31,12 +32,15 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
         <Text>Valor: {v}</Text>
         
         <View style={{flexDirection:'row'}}>
-                    <TouchableOpacity style={estilo.botaoExcluir} onPress={()=>{ConfirmarExcluirTransacao();}}>
+                    <TouchableOpacity 
+                        style={estilo.botaoExcluir} 
+                        onPress={()=>{ConfirmarExcluirTransacao();}}
+                    >
                         <Text style={{fontSize:15,color:"black"}}>EXCLUIR</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={estilo.botaoEditar} 
-                                      onPress={()=>{editarTransacao(transacao)}}>
+                                      onPress={()=>{editarTransacao(transacao.id)}}>
                         <Text style={{fontSize:15,color:"black"}}>EDITAR</Text>
                     </TouchableOpacity>
                 </View>

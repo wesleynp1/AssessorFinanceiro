@@ -1,11 +1,14 @@
 import firestore from '@react-native-firebase/firestore';
+import { Alert } from 'react-native';
 
 //FAZ LIGAÇÃO COM O BANCO DE DADOS
+
+const usuario = "wesleynp"
 
 const conectorBancoDeDados = 
 {
     getContas: async ()=>{
-        return await (await firestore().collection("usuarios").doc("wesleynp").collection("contas").get()
+        return await (await firestore().collection("usuarios").doc(usuario).collection("contas").get()
             .then(q => {
                 return(q.docs.map(c=>{
                     let contas = c.data();
@@ -13,15 +16,37 @@ const conectorBancoDeDados =
                     return contas
                 }))
             })
-            .catch(e=>{alert("Erro de leitura dos dados:"+e)})
+            .catch(e=>{Alert.alert("Erro","Erro de leitura dos dados:"+e)})
         );
+    },    
+
+    transferirEntreContas: async (contaDeOrigem,contaDeDestino, valor)=>{
+        return await firestore().runTransaction(async t => {
+            
+            let refContaDeOrigem  = firestore().doc("usuarios/"+usuario+"/contas/"+contaDeOrigem);
+            let refContaDeDestino = firestore().doc("usuarios/"+usuario+"/contas/"+contaDeDestino);
+
+            let docContaDeOrigem =  await t.get(refContaDeOrigem);
+            let docContaDeDestino = await t.get(refContaDeDestino);
+
+            let dadosContaDeOrigem =  docContaDeOrigem.data();
+            let dadosContaDeDestino = docContaDeDestino.data();
+
+            console.log("dadosContaDeOrigem:  "+dadosContaDeDestino);
+            console.log("dadosContaDeDestino: "+dadosContaDeOrigem);
+
+            t.update(refContaDeOrigem,{saldo: dadosContaDeOrigem.saldo-valor});
+            t.update(refContaDeDestino,{saldo: dadosContaDeDestino.saldo+valor}); 
+        })
+        .then(()=>{Alert.alert("Sucesso!","Transferência entre contas realizada com sucesso!")})
+        .catch(e=>{Alert.alert("Erro","Erro na transferência entre contas"+e)})
     },
 
     //CRUD TRANSAÇÕES
     getTransacoes: async ()=>{
         return await firestore()
                     .collection("usuarios")
-                    .doc("wesleynp")
+                    .doc(usuario)
                     .collection("transacoes")
                     .orderBy("data","desc")
                     .get()
@@ -34,51 +59,68 @@ const conectorBancoDeDados =
                             return t;
                         })
                     })
-                    .catch(e=>{alert("Erro de leitura dos dados"+e)});
+                    .catch(e=>{Alert.alert("Erro","Erro de leitura dos dados"+e)});
     },
 
     inserirTransacao: async (t)=>{
 
         return await firestore().runTransaction(async tr => {
-            t.conta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
-            let TransacaoRef = firestore().collection("usuarios/wesleynp/transacoes").doc();
+            t.conta = firestore().doc("usuarios/"+usuario+"/contas/"+t.conta);
+            let TransacaoRef = firestore().collection("usuarios/"+usuario+"/transacoes").doc();
             await tr.set(TransacaoRef,t);            
             const estadoAtualConta =  await tr.get(t.conta);
             tr.update(t.conta,{saldo: estadoAtualConta.data().saldo+t.valor})
         })
-        .then(()=>{alert("Transação adicionada com sucesso!")})
-        .catch(()=>{alert("Erro ao adicionar transacao")})
+        .then(()=>{Alert.alert("Sucesso!","Transação adicionada com sucesso!")})
+        .catch(()=>{Alert.alert("ERRO","Erro ao adicionar transacao")})
     },
 
     atualizarTransacao: async (t)=>{
+        t.conta = firestore().doc("usuarios/"+usuario+"/contas/"+t.conta);
+
         return await firestore().runTransaction(async tr =>{
             //LEITURAS
-            let referenciaTransacao = firestore().doc("usuarios/wesleynp/transacoes/"+t.id);
-            let referenciaNovaConta = firestore().doc("usuarios/wesleynp/contas/"+t.conta);
-            
+            let referenciaTransacao = firestore().doc("usuarios/"+usuario+"/transacoes/"+t.id);
             let transacaoAtual = await tr.get(referenciaTransacao);
-            let referenciaContaAntiga = transacaoAtual.data().conta;
-            let contaAntiga = await tr.get(referenciaContaAntiga);
-            let contaNova = await tr.get(referenciaNovaConta);
+            let dadosTransacaoAtual = transacaoAtual.data();
+                        
+            if(dadosTransacaoAtual.conta.path==t.conta.path)
+            {
+                if(dadosTransacaoAtual.valor==t.valor){
+                    tr.update(referenciaTransacao,{
+                        categoria: t.categoria,
+                        data: t.data
+                        });
+                }else{
+                    let conta = await tr.get(t.conta);
 
-            //ESCRITAS
-            tr.update(
-                referenciaContaAntiga,{
-                saldo: contaAntiga.data().saldo - transacaoAtual.data().valor});
+                    tr.update(t.conta,{saldo: (conta.data().saldo-dadosTransacaoAtual.valor+t.valor)})
+                    tr.update(referenciaTransacao,{
+                        categoria: t.categoria,
+                        data: t.data,
+                        valor: t.valor
+                        });
+                }
+            }else{
+                let contaAntiga = await tr.get(dadosTransacaoAtual.conta);
+                let contaNova = await tr.get(t.conta);
 
-            tr.update(referenciaNovaConta,{
-                saldo: contaNova.data().saldo + t.valor})
+                let dadosContaAntiga = contaAntiga.data();
+                let dadosContaNova = contaNova.data();
 
-            tr.update(referenciaTransacao,{
-                categoria: t.categoria,
-                data: t.data,
-                valor: t.valor,
-                conta: referenciaNovaConta
-                })
-            
+                tr.update(dadosTransacaoAtual.conta,{saldo: dadosContaAntiga.saldo-dadosTransacaoAtual.valor})
+                tr.update(t.conta,{saldo: dadosContaNova.saldo+t.valor})
+
+                tr.update(referenciaTransacao,{
+                    categoria: t.categoria,
+                    data: t.data,
+                    valor: t.valor,
+                    conta: t.conta
+                    });
+            }           
         })
-        .then(()=>{alert("Transação atualizada com sucesso!")})
-        .catch(()=>{alert("Erro ao atualizar a transacao")})
+        .then(()=>{Alert.alert("Sucesso!","Transação atualizada com sucesso!")})
+        .catch(e=>{Alert.alert("Erro","Erro ao atualizar a transacao:"+e)})
         
     },
 
@@ -86,7 +128,7 @@ const conectorBancoDeDados =
         return await firestore().runTransaction(async tr =>{
 
             //FASE DE LEITURA
-            let referenciaTransacaoParaExcluir = firestore().doc("usuarios/wesleynp/transacoes/"+id);
+            let referenciaTransacaoParaExcluir = firestore().doc("usuarios/"+usuario+"/transacoes/"+id);
             let transacaoParaExluir = await tr.get(referenciaTransacaoParaExcluir);
 
             let referenciaConta = transacaoParaExluir.data().conta;
@@ -96,8 +138,8 @@ const conectorBancoDeDados =
             tr.update(referenciaConta,{saldo: conta.data().saldo-transacaoParaExluir.data().valor})
             tr.delete(referenciaTransacaoParaExcluir);
         })
-        .then(()=>{alert("Transação excluida com sucesso!")})
-        .catch(()=>{alert("Erro ao excluir a transacao")})
+        .then(()=>{Alert.alert("Sucesso!","Transação excluida com sucesso!")})
+        .catch(()=>{Alert.alert("Erro","Erro ao excluir a transacao")})
     }    
 }
 

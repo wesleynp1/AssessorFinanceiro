@@ -3,7 +3,7 @@ import { Text,View,TextInput,StyleSheet, TouchableOpacity } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 
 import CampoDinheiro from "./CampoDinheiro";
-import CampoData from "./CampoData";
+import {CampoData2} from "./CampoData";
 
 const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     const [categoria,setCategoria] = useState(transacaoInicial.categoria);
@@ -92,16 +92,16 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
                     onChangeText={setCategoria}
                     />
 
-        <CampoData  estilo={estilo.campos}
-                    aoMudarTexto={setData}
-                    valorInicial={data}                    
-                   />
-
         <CampoDinheiro
                     estilo={estilo.campos}
                     valorInicial={valor}
                     aoMudarTexto={setValor}
                     />
+
+        <CampoData2 estilo={estilo.campos}
+                    aoMudarTexto={setData}
+                    valorInicial={data}                    
+                   />
         
         <TouchableOpacity style={estilo.botaoRegistrar} onPress={aoPressionarRegistrar}>
             <Text>REGISTRAR</Text>

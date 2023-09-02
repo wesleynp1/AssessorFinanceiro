@@ -1,5 +1,6 @@
 import React,{useState} from "react";
-import {TextInput} from "react-native";
+import {TextInput, View, Text, TouchableOpacity} from "react-native";
+import DatePicker from "react-native-date-picker";
 
 //Ideia de componente encapsulado que corrige e filtra entradas do usuário retornando o valor "data"
 
@@ -91,6 +92,29 @@ const CampoData = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}})=> {
         ref={r=>{referencia(r)}}
         />
     );
+}
+
+export const CampoData2 = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}}) =>{
+    const [valor, setValor] = useState(valorInicial);
+    const [modalVisivel, setmodalVisivel] = useState(false);
+
+    return <View>
+                <DatePicker  
+                modal
+                open={modalVisivel}
+                mode="date" 
+                style={estilo} 
+                date={valor} 
+                onConfirm={d=>{aoMudarTexto(d);setValor(d);setmodalVisivel(false)}} 
+                onCancel={(()=>{setmodalVisivel(false)})}
+                confirmText={"confirmar"}
+                cancelText={"cancelar"}
+                title={"Selecione a data"}/>
+
+                <TouchableOpacity onPress={()=>{setmodalVisivel(true)}}>
+                    <Text style={estilo}>{("0"+valor.getDate()).slice(-2)}/{("0"+(valor.getMonth()+1)).slice(-2)}/{valor.getFullYear()}</Text>
+                </TouchableOpacity>
+            </View>
 }
 
 export default CampoData;
