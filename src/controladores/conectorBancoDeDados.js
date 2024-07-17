@@ -8,8 +8,16 @@ const usuario = "wesleynp"
 const conectorBancoDeDados = 
 {
     getContas: async ()=>{
-        return await (await firestore().collection("usuarios").doc(usuario).collection("contas").get()
+        return await (
+            await firestore()
+            .collection("usuarios")
+            .doc(usuario)
+            .collection("contas")
+            .get()
             .then(q => {
+                
+                console.log("Os dados foram pegos! resultado:" + q.size)
+
                 return(q.docs.map(c=>{
                     let contas = c.data();
                     contas.id = c.id;
@@ -43,12 +51,14 @@ const conectorBancoDeDados =
     },
 
     //CRUD TRANSAÇÕES
-    getTransacoes: async ()=>{
+    getTransacoes: async (ano)=>{
         return await firestore()
                     .collection("usuarios")
                     .doc(usuario)
                     .collection("transacoes")
                     .orderBy("data","desc")
+                    .where("data",">=",new Date(ano+'-01-01'))
+                    .where("data","<",new Date((ano+1)+'-01-01'))
                     .get()
                     .then(q => { 
                         return q.docs.map(r => {
@@ -126,7 +136,6 @@ const conectorBancoDeDados =
 
     excluirTransacao: async (id)=>{
         return await firestore().runTransaction(async tr =>{
-
             //FASE DE LEITURA
             let referenciaTransacaoParaExcluir = firestore().doc("usuarios/"+usuario+"/transacoes/"+id);
             let transacaoParaExluir = await tr.get(referenciaTransacaoParaExcluir);
@@ -139,7 +148,7 @@ const conectorBancoDeDados =
             tr.delete(referenciaTransacaoParaExcluir);
         })
         .then(()=>{Alert.alert("Sucesso!","Transação excluida com sucesso!")})
-        .catch(()=>{Alert.alert("Erro","Erro ao excluir a transacao")})
+        .catch(e=>{Alert.alert("Erro","Erro ao excluir a transacao\nmotivo:"+e)})
     }    
 }
 

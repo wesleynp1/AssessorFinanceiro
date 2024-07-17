@@ -71,7 +71,7 @@ let estilo = StyleSheet.create({
             textAlign:'center'
         },  
         Texto:{
-            fontSize: 15,
+            fontSize: 32,
             color:"black",
             textAlign:'center'
         },
@@ -81,7 +81,7 @@ let estilo = StyleSheet.create({
             backgroundColor: "#AAAACC",
             borderColor:"black",
             borderStyle:"solid",
-            borderWidth:2,
+            borderWidth:2,            
         },
         CampoDinheiro: {
             backgroundColor: "gray", 

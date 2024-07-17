@@ -36,7 +36,7 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
                         style={estilo.botaoExcluir} 
                         onPress={()=>{ConfirmarExcluirTransacao();}}
                     >
-                        <Text style={{fontSize:15,color:"black"}}>EXCLUIR</Text>
+                        <Text style={{fontSize:15,color:"white"}}>EXCLUIR</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={estilo.botaoEditar} 

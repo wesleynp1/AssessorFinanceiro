@@ -6,6 +6,7 @@ import Transacao from "../Transacao";
 import { dateParaTexto } from "../CampoData.js";
 import {inteiroParaReal} from "../CampoDinheiro"
 import estatistica from "../../controladores/estatistica.js";
+import { TextInput } from "react-native-gesture-handler";
 
 const mesesDoAno = [
     "Janeiro", 
@@ -22,12 +23,15 @@ const mesesDoAno = [
     "Dezembro"]
 
 const PaginaTransacoes = ({
+    ano,
+    selecionarAno,
     irParaPaginaNovaTransacao, 
     irParaPaginaEditarTransacao, 
     transacoes, 
     excluirTransacao})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
+    const [anoSelecionado,setAnoSelecionado] = useState(ano);
 
     let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);    
     
@@ -42,9 +46,12 @@ const PaginaTransacoes = ({
 
     let receita = inteiroParaReal(estatistica.getReceita(transacoesDoMes));
     let despesa = inteiroParaReal(estatistica.getDespesa(transacoesDoMes));
-    let balanco = inteiroParaReal(estatistica.getBalanco(transacoesDoMes));
-    let balancoNegativo = (estatistica.getBalanco(transacoesDoMes)<0);
-    if(balancoNegativo)balanco = balanco.replace("R$ ","R$ -");
+
+    let numeroBalaco = estatistica.getBalanco(transacoesDoMes)
+    let balanco_E_negativo = numeroBalaco<0    
+    let balanco = inteiroParaReal(numeroBalaco)
+    if(balanco_E_negativo)balanco = balanco.replace("R$ ","R$ -");
+        
 
     return(
         <View style={{flex:1,backgroundColor:"#AAAA00"}}>
@@ -54,16 +61,26 @@ const PaginaTransacoes = ({
                 
                 <Text style={{color:'black',textAlign:'center'}}>MÊS SELECIONADO: </Text>
 
-                <Picker 
-                    onValueChange={m =>{setMesSelecionado(m)}}
-                    selectedValue={mesSelecionado}
-                    style={{width:180,alignSelf:"center",backgroundColor:'#808000'}}>
-                    {pickersMes}
-                </Picker>
-                
+                <View style={{flexDirection:'row',justifyContent:'center'}}>
+                    <Picker 
+                        onValueChange={m =>{setMesSelecionado(m)}}
+                        selectedValue={mesSelecionado}
+                        style={{width:180,backgroundColor:'#808000',}}>
+                        {pickersMes}
+                    </Picker>
+
+                    <TextInput 
+                        value={anoSelecionado.toString()} 
+                        placeholder={anoSelecionado.toString()}
+                        style={{width:64,textAlign:"center",backgroundColor:'#909000'}}
+                        onChangeText={setAnoSelecionado}
+                        onSubmitEditing={()=>selecionarAno(parseInt(anoSelecionado))}
+                        />
+                </View>
+
                 <Text style={{color:'#007700',textAlign:'center'}}>RECEITA DO MÊS: {receita}</Text>
                 <Text style={{color:'#770000',textAlign:'center'}}>DESPESA DO MÊS: {despesa}</Text>
-                <Text style={{color:(balancoNegativo ? "#FF0000" : '#000077'),textAlign:'center'}}>BALANÇO DO MÊS: {balanco}</Text>
+                <Text style={{color:(balanco_E_negativo ? "#FF0000" : '#000077'),textAlign:'center'}}>BALANÇO DO MÊS: {balanco}</Text>
                 
                 <Button 
                     title={"registrar nova receita"}

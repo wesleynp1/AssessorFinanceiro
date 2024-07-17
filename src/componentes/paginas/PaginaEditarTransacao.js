@@ -1,6 +1,7 @@
-import { View,Text, Button } from "react-native";
+import { View,Text, Alert } from "react-native";
 import FormularioTransacao from "../FormularioTransacao";
 import {Picker} from '@react-native-picker/picker';
+import { inteiroParaReal } from "../CampoDinheiro";
 import { useState } from "react";
 
 const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas})=>{
@@ -11,10 +12,32 @@ const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas}
         atualizarTransacao(t);
     }
 
+    const ConfirmarEditarTransacao = (tr)=>{
+        Alert.alert(
+            "Salvar alterações na transação",
+            "Registrar as alterações na " + (eDespesa ? "despesa" : "receita") + 
+            " de "+ inteiroParaReal(tr.valor) + "(" + tr.conta + ")" +
+            " em "+ 
+            ("0"+tr.data.getDate()).slice(-2) + "/" + 
+            ("0"+(tr.data.getMonth()+1)).slice(-2) +"/" +
+            (tr.data.getFullYear()) +
+            " da categoria " + tr.categoria + "?",
+            [
+                {
+                    text:"Cancelar"
+                },
+                {
+                    text:"Registrar",
+                    onPress: ()=> aoSubmenter(tr)
+                }
+            ]
+            );
+    }
+
     return(
         <View>
             <Text style={{color:(eDespesa ? "red" : "green"),fontSize:16, margin: 10, textAlign:"center"}}>
-                INSIRA AS INFORMAÇÕES DA NOVA {(eDespesa ? "DESPESA" : "RECEITA")}
+                INSIRA AS INFORMAÇÕES DA {(eDespesa ? "DESPESA" : "RECEITA")}
             </Text>
 
             <Picker 
@@ -31,7 +54,7 @@ const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas}
             <FormularioTransacao    transacaoInicial={transacaoInicial} 
                                     contas={nomeContas}
                                     eDespesa={eDespesa}
-                                    aoSubmeter={aoSubmenter}/>
+                                    aoSubmeter={ConfirmarEditarTransacao}/>
         </View>
     );
 }

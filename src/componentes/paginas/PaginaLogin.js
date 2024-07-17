@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, TextInput, Button, Alert} from 'react-native';
+import { View, TextInput, Button, Alert, ToastAndroid} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { salvarUsuarioSenha, autenticarAutomaticamente } from '../../controladores/autoautenticador';
 
@@ -8,43 +8,30 @@ const PaginaLogin = ({onLogin})=>{
     const [senha, setSenha] = useState("");
     const [usuario, setUsuario] = useState("");
     const [autologinDisponivel, setAutologinDisponivel] = useState(null);
-
-    /*if(autologinDisponivel==null){
-      autenticarAutomaticamente().then(l=>{
-        if(l==null){
-          alert("login automatico falhou");
-          setAutologinDisponivel(false);
-        }else{
-          alert("l:"+l);
-          setAutologinDisponivel(true);
-        }
-      });
-    }*/
-
+   
+    
     if(autologinDisponivel==null){
       autenticarAutomaticamente()
       .then(l=>{
-        Alert.alert("LOGIN","Logado automaticamente em " + l.user.email);
+        ToastAndroid.show("Logado automaticamente em " + l.user.email,ToastAndroid.LONG);
         onLogin({conta: l.user});
       })
       .catch(e=>{
-        alert(e);
+        alert("Erro ao tentar logar automaticamente: "+e);
         setAutologinDisponivel(false);
         setCarregando(false);
       });
     }
-    
-      
 
     let logar = ()=>{
         if(senha=="" || usuario==""){Alert.alert("Ops!","digite a senha");return;}
 
         setCarregando(true);
-
-        auth().signInWithEmailAndPassword("wesleynp@google.com",senha)
+        
+        auth().signInWithEmailAndPassword(usuario,senha)
         .then(u => {
           salvarUsuarioSenha(usuario,senha)
-          .then(()=>{onLogin({conta:u.user})})
+          onLogin({conta:u.user})
         })
         .catch(e =>{Alert.alert("Erro de Login","erro:"+e);setCarregando(false)})
     }

@@ -14,8 +14,6 @@ import PaginaLogin from './src/componentes/paginas/PaginaLogin';
 import PaginaCarregando from './src/componentes/paginas/PaginaCarregando';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
-import {autenticarAutomaticamente} from './src/controladores/autoautenticador';
-import { View,Text } from 'react-native';
 
 const STACK = createStackNavigator();
 const TAB = createBottomTabNavigator();
@@ -25,42 +23,58 @@ export default class App extends Component{
   constructor(){
     super();
  
-    this.state = {transacoes:[],contas:[],carregando:true,login:null};
+    this.state = {transacoes:[],contas:[],ano:new Date().getFullYear(),carregando:true,login:null};
 
-    this.atualizarSaldoTransacoes = this.atualizarSaldoTransacoes.bind(this);
+    this.buscarSaldoTransacoes = this.buscarSaldoTransacoes.bind(this);
   }
 
-  atualizarSaldoTransacoes()
+  buscarSaldoTransacoes(anoTr = new Date().getFullYear())
   {
     this.setState({carregando:true});
 
     let contas,transacoes;
-    let atualizaState = ()=>{this.setState({contas:contas, transacoes:transacoes, carregando:false})};
+    let atualizaState = ()=>{this.setState({contas:contas, transacoes:transacoes, ano:anoTr, carregando:false})};
     
     conectorBancoDeDados.getContas()
-    .then(c => {contas = c;if(transacoes!=undefined)atualizaState();})
-    .catch(()=>{alert("Falha ao acessar o banco de dados de transações")});
+    .then(c => {
+      console.log("contas recuperadas:" + c.length)
+      contas = c;
+      if(transacoes!=undefined)atualizaState();
+    })
+    .catch(()=>{
+      alert("Falha ao acessar o banco de dados de transações")
+    });
 
-    conectorBancoDeDados.getTransacoes()
-    .then(t =>{transacoes=t;if(contas!=undefined)atualizaState();})
-    .catch(()=>{alert("Falha ao acessar o banco de dados de contas")});
+    conectorBancoDeDados.getTransacoes(anoTr)
+    .then(t =>{
+      console.log("transações recuperadas:" + t.length)
+      transacoes=t;
+      if(contas!=undefined)atualizaState();
+    })
+    .catch(()=>{
+      alert("Falha ao acessar o banco de dados de contas")
+    });
   }
   
   render()
   {
+    //return (<Paginateste/>)
+
     //PAGINAS DE CRUD DE TRANSACOES
     let AbaTransacoes = () => {
 
       let IniciaPaginaTransacoes = ({navigation})=>{
         return (
-          <PaginaTransacoes  
+          <PaginaTransacoes
             transacoes={this.state.transacoes} 
             contas={this.state.contas} 
+            ano={this.state.ano}
+            selecionarAno={a =>{this.buscarSaldoTransacoes(a);}}
             irParaPaginaNovaTransacao={(d)=>{navigation.navigate("PaginaNovaTransacao",{eDespesa: d})}} 
             irParaPaginaEditarTransacao={(id)=>{navigation.navigate("PaginaEditarTransacao",{id:id})}}
             excluirTransacao={(id)=>{
               conectorBancoDeDados.excluirTransacao(id)
-              .then(this.atualizarSaldoTransacoes)
+              .then(this.buscarSaldoTransacoes)
             }} 
           />
         ); 
@@ -71,7 +85,7 @@ export default class App extends Component{
           <PaginaNovaTransacao 
             novaTransacao={t =>{
               conectorBancoDeDados.inserirTransacao(t)
-              .then(()=>{this.atualizarSaldoTransacoes()})
+              .then(()=>{this.buscarSaldoTransacoes()})
             }}
             nomeContas={this.state.contas.map(d => d.id)}
             eDespesa={route.params.eDespesa}
@@ -86,7 +100,7 @@ export default class App extends Component{
           <PaginaEditarTransacao 
           atualizarTransacao={t =>{
             conectorBancoDeDados.atualizarTransacao(t)
-            .then(this.atualizarSaldoTransacoes)
+            .then(this.buscarSaldoTransacoes)
           }}
           nomeContas={this.state.contas.map(d => d.id)}
           transacaoInicial={transacaoInicial}
@@ -111,7 +125,7 @@ export default class App extends Component{
           transacoes={this.state.transacoes}
           tranferirEntreContas={(contaOrigem,contaDestino,valor)=>{
             conectorBancoDeDados.transferirEntreContas(contaOrigem,contaDestino,valor)
-            .then(()=>{this.atualizarSaldoTransacoes()})
+            .then(()=>{this.buscarSaldoTransacoes()})
           }}
         />
       )
@@ -120,7 +134,11 @@ export default class App extends Component{
     //PÁGINA ESTATISTICA
     let AbaEstatistica = ()=> {
       return(
-        <PaginaEstatistica transacoes={this.state.transacoes}/>
+        <PaginaEstatistica 
+          ano={this.state.ano} 
+          transacoes={this.state.transacoes}
+          selecionarAno={a =>{this.buscarSaldoTransacoes(a);}}
+          />
       )
     }
 
@@ -137,10 +155,9 @@ export default class App extends Component{
       );
     }
 
-    if(this.state.login==null){
-      return <PaginaLogin onLogin={l=>{this.setState({login:l});this.atualizarSaldoTransacoes()}}/>;
-    }
-    
+    if(this.state.login==null)
+    {return <PaginaLogin onLogin={l=>{this.setState({login:l});this.buscarSaldoTransacoes()}}/>;}
+        
     if(this.state.carregando)return <PaginaCarregando/>;
 
     return telaNavegacaoTab();

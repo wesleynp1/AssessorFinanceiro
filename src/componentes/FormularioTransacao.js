@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import { Text,View,TextInput,StyleSheet, TouchableOpacity } from "react-native";
+import { Text,View,TextInput,StyleSheet, TouchableOpacity} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 
 import CampoDinheiro from "./CampoDinheiro";
@@ -11,34 +11,36 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     const [conta,setConta] = useState(transacaoInicial.conta);
     const [valor,setValor] = useState(Math.abs(transacaoInicial.valor));
 
-    let corPadrão = (eDespesa ? "#AA0000" :'#009900');
 
-    const verificarDados = (sePostivo,seNegativo)=>{
+    const verificarDados = (seOk,seNaoOk)=>{
         let categoriaOk = categoria!="";
         let valorOk = valor!=0;
         let dataOk = new Date(data)!=undefined;
 
         if (categoriaOk && valorOk && dataOk){
-            sePostivo();
+            aoSubmeter({
+                categoria:categoria,
+                data: new Date(data), 
+                conta: conta,
+                valor: parseInt((eDespesa ? "-" :'')+valor)
+            })
         }else{
             seNegativo();
         }
     }
 
     const aoPressionarRegistrar = ()=>{
-        let sePostivo = ()=> {aoSubmeter({
-            categoria:categoria,
-            data: new Date(data), 
-            conta: conta,
-            valor: parseInt((eDespesa ? "-" :'')+valor)
-        })}
+        let sePostivo = ()=> {}
 
         let seNegativo = ()=> {alert("PREENCHE DIREITO ESTA MERDA!!!")};
         
         
-        verificarDados(sePostivo,seNegativo)
-        
+        verificarDados(sePostivo,seNegativo)        
     };
+
+    //ESTILO DO COMPONENTE
+    let corPadrão = (eDespesa ? "#AA0000" :'#009900');
+    let corFonte  = (eDespesa ? 'white' :'black');
 
     const estilo= StyleSheet.create({
         rotulos:{
@@ -60,14 +62,20 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
             height:32,
             justifyContent:"center",
             alignItems:"center",
-            margin:10}
+            margin:10},
+        selecionador:{
+            backgroundColor:corPadrão,
+            color:corFonte,
+            textAlign:"center"
+        }
+
     })
 
     
         let pickersContas = []
         for(let i=0; i<contas.length;i++)
         {
-            pickersContas.push(<Picker.Item style={{backgroundColor:corPadrão,color:"black",textAlign:"center"}} 
+            pickersContas.push(<Picker.Item style={estilo.selecionador} 
                                             label={contas[i]} 
                                             value={contas[i]} 
                                             key={i}/>)

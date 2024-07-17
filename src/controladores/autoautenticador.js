@@ -3,7 +3,6 @@ import {Alert} from "react-native";
 import auth from '@react-native-firebase/auth';
 
 enablePromise(true);
-DEBUG(true);
 
 const abrirBancoDeDados = async ()=>{
     return openDatabase({name: "AssessorFinanceiro.db", location: "default"})
@@ -55,6 +54,7 @@ export const autenticarAutomaticamente = async ()=>{
     let resultado = await getUsuarioSenha()
     if(resultado==null)return null;
     
-    let usuarioSenha= await auth().signInWithEmailAndPassword("wesleynp@google.com",resultado);
+    //A PRÓXIMA LINHA ESTÁ ERRADA E DEVE SER ALTERADO (PROVISÓRIO)
+    let usuarioSenha= await auth().signInWithEmailAndPassword("wesleynp987@gmail.com",resultado);
     return usuarioSenha;
 }

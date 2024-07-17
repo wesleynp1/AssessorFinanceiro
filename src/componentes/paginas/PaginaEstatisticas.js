@@ -3,6 +3,7 @@ import { SafeAreaView ,View,Text, StyleSheet, FlatList} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import estatistica from "../../controladores/estatistica";
 import { inteiroParaReal } from "../CampoDinheiro";
+import { TextInput } from "react-native-gesture-handler";
 
 const mesesDoAno = [
     "Janeiro", 
@@ -19,9 +20,10 @@ const mesesDoAno = [
     "Dezembro"
 ]
 
-const PaginaEstatistica = ({transacoes})=>{
+const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth()); 
+    const [anoSelecionado,setAnoSelecionado] = useState(ano);
 
     let pickersMes = []
     for(let i=0; i<mesesDoAno.length;i++){
@@ -51,15 +53,25 @@ const PaginaEstatistica = ({transacoes})=>{
 
     return(
         <View style={{flex:1}}>
+            
             <View style={{flex:1}}>
                 <Text style={estilo.Titular}>ESTATÍSTICA</Text>
+                <View style={{flexDirection:'row',justifyContent:'center'}}>
+                    <Picker 
+                            onValueChange={m =>{setMesSelecionado(m)}}
+                            selectedValue={mesSelecionado}
+                            style={{width:180,alignSelf:"center",backgroundColor:'black'}}> 
+                        {pickersMes}
+                    </Picker>
 
-                <Picker 
-                        onValueChange={m =>{setMesSelecionado(m)}}
-                        selectedValue={mesSelecionado}
-                        style={{width:180,alignSelf:"center",backgroundColor:'black'}}> 
-                    {pickersMes}
-                </Picker>
+                    <TextInput 
+                            value={anoSelecionado.toString()}
+                            placeholder={anoSelecionado.toString()}
+                            style={{width:64,textAlign:"center",backgroundColor:'#909000'}}
+                            onChangeText={setAnoSelecionado}
+                            onSubmitEditing={()=>selecionarAno(parseInt(anoSelecionado))}
+                            />
+                    </View>
             </View>
 
             <SafeAreaView style={{flex:5}}>
@@ -84,7 +96,7 @@ const estilo = StyleSheet.create({
     },
 
     Texto:{
-        fontSize: 15,
+        fontSize: 36,
         color:"black",
         textAlign:'center'
     },
