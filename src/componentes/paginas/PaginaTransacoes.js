@@ -22,6 +22,34 @@ const mesesDoAno = [
     "Novembro", 
     "Dezembro"]
 
+    const filtrarTransacao = (transacoes,texto)=>{
+
+        let tratarTexto = (t) => {        
+            return t.toLowerCase() //NÃO É CASE-SENSITIVE
+                    .replace("á","a")//NÃO DIFERE ACENTO AGUDO 
+                    .replace("é","e")
+                    .replace("í","i")
+                    .replace("ó","o")
+                    .replace("ú","u")
+                    .replace("â","a")//NÃO DIFERE ACENTO circunflexo
+                    .replace("ê","e")
+                    .replace("ô","o")
+                    ;
+                }
+    
+        if(texto=="")return transacoes;
+
+        return transacoes.filter(transacao => 
+            {
+                return(
+                    tratarTexto(transacao.categoria).includes(tratarTexto(texto)) ||
+                    dateParaTexto(transacao.data).includes(tratarTexto(texto)) ||
+                    tratarTexto(transacao.conta.toString()).includes(tratarTexto(texto)) || 
+                    transacao.valor.toString().includes(tratarTexto(texto))
+                );
+            });
+    }
+
 const PaginaTransacoes = ({
     ano,
     selecionarAno,
@@ -32,8 +60,10 @@ const PaginaTransacoes = ({
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
     const [anoSelecionado,setAnoSelecionado] = useState(ano);
+    const [filtro,setFiltro] = useState("");
 
-    let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);    
+    let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);   
+    let transacoesDoMesFiltrado = filtrarTransacao(transacoesDoMes,filtro);
     
     let pickersMes = []
     for(let i=0; i<mesesDoAno.length;i++){
@@ -54,12 +84,10 @@ const PaginaTransacoes = ({
         
 
     return(
-        <View style={{flex:1,backgroundColor:"#AAAA00"}}>
+        <View style={{flex:1,backgroundColor:"#292616"}}>
             <View style={{flex:3}}>
                 <Text style={estilo.Titulo}>Assistente Financeiro</Text>
-                <Text style={{color:'black',textAlign:'center'}}>HOJE: {dateParaTexto(new Date())}</Text>
-                
-                <Text style={{color:'black',textAlign:'center'}}>MÊS SELECIONADO: </Text>
+                <Text style={{color:'white',textAlign:'center'}}>HOJE: {dateParaTexto(new Date())}</Text>
 
                 <View style={{flexDirection:'row',justifyContent:'center'}}>
                     <Picker 
@@ -78,9 +106,11 @@ const PaginaTransacoes = ({
                         />
                 </View>
 
-                <Text style={{color:'#007700',textAlign:'center'}}>RECEITA DO MÊS: {receita}</Text>
-                <Text style={{color:'#770000',textAlign:'center'}}>DESPESA DO MÊS: {despesa}</Text>
-                <Text style={{color:(balanco_E_negativo ? "#FF0000" : '#000077'),textAlign:'center'}}>BALANÇO DO MÊS: {balanco}</Text>
+                <View style={{ display:"flex", flexDirection: "row"}}>
+                    <Text style={{flex:1,color:'#007700',textAlign:'center'}}>RECEITA: {"\n"+receita}</Text>
+                    <Text style={{flex:1, color:'#d66554',textAlign:'center'}}>DESPESA: {"\n"+despesa}</Text>
+                    <Text style={{flex:1, color:(balanco_E_negativo ? "#FF0000" : '#96c3d9'),textAlign:'center'}}>BALANÇO: {"\n"+balanco}</Text>
+                </View>
                 
                 <Button 
                     title={"registrar nova receita"}
@@ -95,10 +125,14 @@ const PaginaTransacoes = ({
                     />
             </View>
 
-            
+            <TextInput  style={{backgroundColor:"#221122", margin:4,backgroundColor: "white"}}
+                                placeholderTextColor="black" 
+                                placeholder="Digite uma informacao para filtrar" 
+                                onChangeText={t=>{setFiltro(t)}}/>
+                
                 <SafeAreaView style={{flex:4, backgroundColor:"#221122",margin:4}}>
                         <FlatList
-                            data={transacoesDoMes}
+                            data={transacoesDoMesFiltrado}
                             renderItem={({item})=>(
                                 <Transacao 
                                 excluirTransacao={excluirTransacao} 
@@ -116,7 +150,7 @@ let estilo = StyleSheet.create({
     },
     Titulo:{
         fontSize: 24,
-        color:"black",
+        color:"white",
         textAlign:'center'
     },  
     Texto:{
@@ -127,7 +161,7 @@ let estilo = StyleSheet.create({
     Quadro: {  
         flex:1,
         margin:5,
-        backgroundColor: "#AAAACC",
+        backgroundColor: "#292616",
         borderColor:"black",
         borderStyle:"solid",
         borderWidth:2,
