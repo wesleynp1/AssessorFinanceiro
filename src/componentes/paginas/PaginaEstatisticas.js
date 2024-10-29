@@ -17,12 +17,13 @@ const mesesDoAno = [
     "Setembro", 
     "Outubro", 
     "Novembro", 
-    "Dezembro"
+    "Dezembro",
+    "ANUAL"
 ]
 
 const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
-    const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth()); 
+    const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
     const [anoSelecionado,setAnoSelecionado] = useState(ano);
 
     let pickersMes = []
@@ -30,12 +31,14 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
         pickersMes.push(<Picker.Item label={mesesDoAno[i]} value={i} key={i}/>)
     }
 
-    let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);
+    if(mesSelecionado!=12){//SE NÃO FOR O ANUAL
+        transacoes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);
+    }
 
-    let receitaTotal = estatistica.getReceita(transacoesDoMes);
-    let despesaTotal = estatistica.getDespesa(transacoesDoMes);
+    let receitaTotal = estatistica.getReceita(transacoes);
+    let despesaTotal = estatistica.getDespesa(transacoes);
     
-    let categorias =  estatistica.getValorPorCategorias(transacoesDoMes);
+    let categorias =  estatistica.getValorPorCategorias(transacoes);
     
     let renderCategorias = (vc)=>{
         
@@ -60,7 +63,7 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
                     <Picker 
                             onValueChange={m =>{setMesSelecionado(m)}}
                             selectedValue={mesSelecionado}
-                            style={{width:180,alignSelf:"center",backgroundColor:'black'}}> 
+                            style={{width:180,alignSelf:"center",backgroundColor:'black',color:"white"}}> 
                         {pickersMes}
                     </Picker>
 
