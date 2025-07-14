@@ -1,5 +1,5 @@
 import {useState} from "react";
-import { View,Text, Button,FlatList, SafeAreaView,StyleSheet } from "react-native";
+import { View,Text, Button,FlatList, SafeAreaView, StyleSheet, SectionList } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 
 import Transacao from "../Transacao";
@@ -51,20 +51,34 @@ const mesesDoAno = [
     }
 
 const PaginaTransacoes = ({
-    ano,
-    selecionarAno,
-    irParaPaginaNovaTransacao, 
-    irParaPaginaEditarTransacao, 
-    transacoes, 
-    excluirTransacao})=>{
+        ano,
+        selecionarAno,
+        irParaPaginaNovaTransacao, 
+        irParaPaginaEditarTransacao, 
+        transacoes, 
+        excluirTransacao})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
     const [anoSelecionado,setAnoSelecionado] = useState(ano);
     const [filtro,setFiltro] = useState("");
 
+    //FILTRA TRANSAÇÕES
     let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);   
     let transacoesDoMesFiltrado = filtrarTransacao(transacoesDoMes,filtro);
+
+    //CATEGORIZA TRANSAÇÕES
+    SecaoDia = {title: "", data: ""};
+    transacoesCategorizadas = [];
+    transacoesDoMesFiltrado.forEach(t => {
+        if(dateParaTexto(t.data)!=SecaoDia.title){
+            if(SecaoDia.title!="")transacoesCategorizadas.push(SecaoDia);
+            SecaoDia = {title: dateParaTexto(t.data), data: [t]};
+        }else{
+            SecaoDia.data.push(t);
+        }
+    }); 
     
+    //PREPARA O PICKER MESES
     let pickersMes = []
     for(let i=0; i<mesesDoAno.length;i++){
         pickersMes.push(<Picker.Item    
@@ -73,7 +87,7 @@ const PaginaTransacoes = ({
                                         key={i}/>)
     }
 
-
+    //CALCULA RECEITA DESPESA E BALANÇO
     let receita = inteiroParaReal(estatistica.getReceita(transacoesDoMes));
     let despesa = inteiroParaReal(estatistica.getDespesa(transacoesDoMes));
 
@@ -125,21 +139,25 @@ const PaginaTransacoes = ({
                     />
             </View>
 
-            <TextInput  style={{backgroundColor:"#221122", margin:4,backgroundColor: "white"}}
-                                placeholderTextColor="black" 
-                                placeholder="Digite uma informacao para filtrar" 
-                                onChangeText={t=>{setFiltro(t)}}/>
+            <TextInput  style={{backgroundColor:"#221122", margin:4,backgroundColor: "black"}}
+                placeholderTextColor="white" 
+                placeholder="Digite uma informacao para filtrar" 
+                onChangeText={t=>{setFiltro(t)}}/>
                 
                 <SafeAreaView style={{flex:4, backgroundColor:"#221122",margin:4}}>
-                        <FlatList
-                            data={transacoesDoMesFiltrado}
+                        <SectionList                            
+                            sections={transacoesCategorizadas}
+                            renderSectionHeader={({section: {title}}) => (
+                                <Text style={{fontSize:15,textAlign:'center'}}>{title}</Text>
+                            )}
+
                             renderItem={({item})=>(
                                 <Transacao 
                                 excluirTransacao={excluirTransacao} 
-                                editarTransacao={irParaPaginaEditarTransacao} 
+                                editarTransacao={irParaPaginaEditarTransacao}
                                 transacao={item}/>)}
-                            />
-                </SafeAreaView>
+                                />
+            </SafeAreaView>
         </View>
     );
 }

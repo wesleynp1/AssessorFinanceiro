@@ -5,7 +5,7 @@ import {dateParaTexto} from "./CampoData";
 //EXIBE AS INFORMAÇÕES SOBRE A TRANSAÇÃO
 const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
 
-    let v = inteiroParaReal(transacao.valor)
+    let valorEmReal = inteiroParaReal(transacao.valor)
 
     const ConfirmarExcluirTransacao = ()=>{
             Alert.alert(
@@ -26,10 +26,11 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
 
     return(
     <View style={{flex:1,backgroundColor:(transacao.valor<0 ? "red" :'green'), margin:8}}>
-        <Text>Categoria {transacao.categoria}</Text>
-        <Text>Data: {dateParaTexto(transacao.data)}</Text>
-        <Text>Conta: {transacao.conta}</Text>
-        <Text>Valor: {v}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{fontSize:20}}>{transacao.categoria} </Text>
+            <Text style={{fontSize:20}}>{transacao.conta} </Text>
+            <Text style={{fontSize:20}}>{valorEmReal}</Text>            
+        </View>
         
         <View style={{flexDirection:'row'}}>
                     <TouchableOpacity 
