@@ -15,8 +15,6 @@ const conectorBancoDeDados =
             .collection("contas")
             .get()
             .then(q => {
-                
-                console.log("Os dados foram pegos! resultado:" + q.size)
 
                 return(q.docs.map(c=>{
                     let contas = c.data();
@@ -39,9 +37,6 @@ const conectorBancoDeDados =
 
             let dadosContaDeOrigem =  docContaDeOrigem.data();
             let dadosContaDeDestino = docContaDeDestino.data();
-
-            console.log("dadosContaDeOrigem:  "+dadosContaDeDestino);
-            console.log("dadosContaDeDestino: "+dadosContaDeOrigem);
 
             t.update(refContaDeOrigem,{saldo: dadosContaDeOrigem.saldo-valor});
             t.update(refContaDeDestino,{saldo: dadosContaDeDestino.saldo+valor}); 

@@ -139,8 +139,8 @@ android {
         applicationId "com.assessorfinanceiro"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 16
-        versionName "correção em salvamento de senha automático"
+        versionCode 17
+        versionName "Repaginada no app"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
         if (isNewArchitectureEnabled()) {

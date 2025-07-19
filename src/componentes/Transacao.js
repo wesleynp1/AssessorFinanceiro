@@ -1,11 +1,8 @@
 import { View,Text, TouchableOpacity, Alert, StyleSheet } from "react-native"
 import {inteiroParaReal} from "./CampoDinheiro"
-import {dateParaTexto} from "./CampoData";
 
 //EXIBE AS INFORMAÇÕES SOBRE A TRANSAÇÃO
 const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
-
-    let valorEmReal = inteiroParaReal(transacao.valor)
 
     const ConfirmarExcluirTransacao = ()=>{
             Alert.alert(
@@ -25,26 +22,30 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
         }
 
     return(
-    <View style={{flex:1,backgroundColor:(transacao.valor<0 ? "red" :'green'), margin:8}}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{fontSize:20}}>{transacao.categoria} </Text>
-            <Text style={{fontSize:20}}>{transacao.conta} </Text>
-            <Text style={{fontSize:20}}>{valorEmReal}</Text>            
+    <View style={{flexDirection: 'row',backgroundColor:(transacao.valor<0 ? "#660b0bff" :'#085221ff'), margin:8}}>
+
+        <View style={{flex: 8,flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{flexDirection: "column"}}>
+                <Text style={{fontSize:20}}>{transacao.conta} </Text>
+                <Text style={{fontSize:20}}>{transacao.categoria} </Text>
+            </View>
+            <Text style={{fontSize:20}}>{inteiroParaReal(transacao.valor)}</Text>
         </View>
         
-        <View style={{flexDirection:'row'}}>
-                    <TouchableOpacity 
-                        style={estilo.botaoExcluir} 
-                        onPress={()=>{ConfirmarExcluirTransacao();}}
-                    >
-                        <Text style={{fontSize:15,color:"white"}}>EXCLUIR</Text>
-                    </TouchableOpacity>
+        <View style={{flex: 1,flexDirection:'column'}}>
+            <TouchableOpacity 
+                style={estilo.botaoExcluir} 
+                onPress={()=>{ConfirmarExcluirTransacao();}}
+            >
+                <Text style={{fontSize:15,color:"white"}}>❌️</Text>
+            </TouchableOpacity>
 
-                    <TouchableOpacity style={estilo.botaoEditar} 
-                                      onPress={()=>{editarTransacao(transacao.id)}}>
-                        <Text style={{fontSize:15,color:"black"}}>EDITAR</Text>
-                    </TouchableOpacity>
-                </View>
+            <TouchableOpacity style={estilo.botaoEditar} 
+                                onPress={()=>{editarTransacao(transacao.id)}}>
+                <Text style={{fontSize:15,color:"black"}}>📝️</Text>
+            </TouchableOpacity>
+        </View>
+
     </View>
     )
 }
@@ -64,12 +65,12 @@ let estilo = StyleSheet.create({
     },
     botaoExcluir:{
         flex:1, 
-        backgroundColor:'#D50000',        
+        backgroundColor:'#c01515ff',        
         alignItems:'center'
     },
     botaoEditar:{
         flex:1, 
-        backgroundColor:'#00D500',
+        backgroundColor:'#089108ff',
         alignItems:'center'
     }
 

@@ -3,6 +3,7 @@ import auth, { firebase } from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+//import Icon from "@react-native-vector-icons/fontawesome";
 
 //PÁGINAS
 import PaginaTransacoes from './src/componentes/paginas/PaginaTransacoes';
@@ -37,7 +38,6 @@ export default class App extends Component{
     
     conectorBancoDeDados.getContas()
     .then(c => {
-      console.log("contas recuperadas:" + c.length)
       contas = c;
       if(transacoes!=undefined)atualizaState();
     })
@@ -47,7 +47,6 @@ export default class App extends Component{
 
     conectorBancoDeDados.getTransacoes(anoTr)
     .then(t =>{
-      console.log("transações recuperadas:" + t.length)
       transacoes=t;
       if(contas!=undefined)atualizaState();
     })

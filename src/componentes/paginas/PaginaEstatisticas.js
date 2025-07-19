@@ -2,8 +2,11 @@ import { useState } from "react";
 import { SafeAreaView ,View,Text, StyleSheet, FlatList} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import estatistica from "../../controladores/estatistica";
-import { inteiroParaReal } from "../CampoDinheiro";
+
 import { TextInput } from "react-native-gesture-handler";
+
+import {SeletorMesAno}  from "../SeletorMesAno.js";
+import { inteiroParaReal } from "../CampoDinheiro";
 
 const mesesDoAno = [
     "Janeiro", 
@@ -21,6 +24,8 @@ const mesesDoAno = [
     "ANUAL"
 ]
 
+let eDespesa = true;
+
 const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
@@ -31,7 +36,7 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
         pickersMes.push(<Picker.Item label={mesesDoAno[i]} value={i} key={i}/>)
     }
 
-    if(mesSelecionado!=12){//SE NÃO FOR O ANUAL
+    if(mesSelecionado!=13){//SE NÃO FOR O ANUAL
         transacoes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);
     }
 
@@ -40,47 +45,71 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
     
     let categorias =  estatistica.getValorPorCategorias(transacoes);
     
-    let renderCategorias = (vc)=>{
+    const renderCategorias = (vc)=>{
         
         let eDespesa = vc.valor<0;
         let percentual = ((vc.valor/(eDespesa ? despesaTotal : receitaTotal))*100).toFixed(1) +"%";
             
         return (
-            <View key={vc.categoria} style={[estilo.Quadro,{backgroundColor: eDespesa ? "#CC8A8A" : "#8ACC8A"}]}>
+            <View key={vc.categoria} style={[estilo.Quadro,{backgroundColor: eDespesa ? "#420505ff" : "#064e06ff"}]}>
                 <Text style={estilo.Categorias}>{vc.categoria}</Text>
-                <Text style={estilo.Categorias}>Valor: {inteiroParaReal(vc.valor)}</Text>
-                <Text style={estilo.Categorias}>({percentual})</Text> 
+                <Text style={[estilo.Categorias,{textAlign:'left'}]}>{inteiroParaReal(vc.valor)}</Text>
+                <Text style={estilo.Categorias}>{percentual}</Text>
             </View>
         )              
     }
 
-    return(
-        <View style={{flex:1}}>
-            
-            <View style={{flex:1}}>
-                <Text style={estilo.Titular}>ESTATÍSTICA</Text>
-                <View style={{flexDirection:'row',justifyContent:'center'}}>
-                    <Picker 
-                            onValueChange={m =>{setMesSelecionado(m)}}
-                            selectedValue={mesSelecionado}
-                            style={{width:180,alignSelf:"center",backgroundColor:'black',color:"white"}}> 
-                        {pickersMes}
-                    </Picker>
+    const renderCabeçalhoCategoria = ()=>{
+        return(
+            <View style={estilo.Quadro}>
+                <Text style={estilo.Categorias}>Categoria</Text>
+                <Text style={estilo.Categorias}>Valor</Text>
+                <Text style={estilo.Categorias}>Percentual</Text>
+            </View>
+        )
+    }
 
-                    <TextInput 
-                            value={anoSelecionado.toString()}
-                            placeholder={anoSelecionado.toString()}
-                            style={{width:64,textAlign:"center",backgroundColor:'#909000'}}
-                            onChangeText={setAnoSelecionado}
-                            onSubmitEditing={()=>selecionarAno(parseInt(anoSelecionado))}
-                            />
-                    </View>
+    let receitaLiquida = estatistica.getReceitaLiquida(transacoes);
+    let despesaLiquida = estatistica.getDespesaLiquida(transacoes);
+    let balanco = receitaLiquida + despesaLiquida;
+
+    return(
+        <View style={estilo.Pagina}>
+            
+            <View>
+                <Text style={estilo.Titulo}>ESTATÍSTICA</Text>
+                <SeletorMesAno 
+                    aoMudarMes={m =>{setMesSelecionado(m)}}
+                    aoMudarAno={setAnoSelecionado}
+                    aoConfirmarAno={()=>selecionarAno(parseInt(anoSelecionado))}
+                    mesSelecionado={mesSelecionado} 
+                    anoSelecionado={anoSelecionado}/>
+
+                
+                    <View style={{display:'flex', flexDirection: 'row'}}>
+                        <View style={{flex:1}}>
+                            <Text style={estilo.Texto}>Receita Líquida:</Text>
+                            <Text style={estilo.Texto}>{inteiroParaReal(receitaLiquida)}</Text>
+                        </View>
+
+                        <View style={{flex:1}}>
+                            <Text style={estilo.Texto}>Despesa Líquida:</Text>
+                            <Text style={estilo.Texto}>{inteiroParaReal(despesaLiquida)}</Text>
+                        </View>
+
+                        <View style={{flex:1}}>
+                            <Text style={estilo.Texto}>Balanco:</Text>
+                            <Text style={estilo.Texto}>{inteiroParaReal(balanco)}</Text>
+                        </View>                     
+                    </View>                
             </View>
 
-            <SafeAreaView style={{flex:5}}>
+            <SafeAreaView style={{flex:1}}>
                 <FlatList 
+                    ListHeaderComponent={renderCabeçalhoCategoria()}
                     data={categorias}
-                    renderItem={({item})=>renderCategorias(item)}/>
+                    renderItem={({item})=>renderCategorias(item)}/>                    
+                    
             </SafeAreaView>
 
         </View>
@@ -89,32 +118,33 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
 const estilo = StyleSheet.create({
     Pagina:{
-        padding: 16
+        flex:1,
+        backgroundColor: '#333232ff'
     },
 
-    Titular:{
-        color:"black",
+    Titulo:{
+        color:"white",
         textAlign:"center",
         fontSize:24
     },
-
     Texto:{
-        fontSize: 36,
-        color:"black",
+        fontSize: 12,
+        color:"white",
         textAlign:'center'
     },
-
-    Quadro: {  
-        
-        margin:5,
+    Quadro: {
+        flex:1,
+        flexDirection: 'row',
+        margin:2,
         borderColor:"black",
         borderStyle:"solid",
         borderWidth:2,
     },
 
     Categorias:{
-        fontSize: 15,
-        color:"black",
+        flex:1,
+        fontSize: 20,
+        color:"white",
         textAlign:'center'
     }
 });

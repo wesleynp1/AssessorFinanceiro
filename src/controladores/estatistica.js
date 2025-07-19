@@ -45,6 +45,22 @@ const estatistica = {
         }).sort((a,b)=> (a.valor<0 && b.valor<0) ? (a.valor>b.valor) : (a.valor<b.valor));
 
         return valorPorCategoria;
+    },
+
+    getReceitaLiquida:(transacoes)=>{
+        let receitaLiquida = 0;
+        estatistica.getValorPorCategorias(transacoes).forEach(vc=>{
+            if(vc.valor>0) receitaLiquida+= vc.valor;
+        })
+        return receitaLiquida;
+    },
+
+    getDespesaLiquida:(transacoes)=>{
+        let despesaLiquida = 0;
+        estatistica.getValorPorCategorias(transacoes).forEach(vc=>{
+            if(vc.valor<0) despesaLiquida+= vc.valor;
+        })
+        return despesaLiquida;
     }
 
 }

@@ -3,24 +3,13 @@ import { View,Text, Button,FlatList, SafeAreaView, StyleSheet, SectionList } fro
 import {Picker} from '@react-native-picker/picker';
 
 import Transacao from "../Transacao";
+import {SeletorMesAno}  from "../SeletorMesAno.js";
 import { dateParaTexto } from "../CampoData.js";
 import {inteiroParaReal} from "../CampoDinheiro"
 import estatistica from "../../controladores/estatistica.js";
 import { TextInput } from "react-native-gesture-handler";
 
-const mesesDoAno = [
-    "Janeiro", 
-    "Fevereiro", 
-    "Março", 
-    "Abril", 
-    "Maio", 
-    "Junho", 
-    "Julho", 
-    "Agosto", 
-    "Setembro", 
-    "Outubro", 
-    "Novembro", 
-    "Dezembro"]
+
 
     const filtrarTransacao = (transacoes,texto)=>{
 
@@ -33,21 +22,31 @@ const mesesDoAno = [
                     .replace("ú","u")
                     .replace("â","a")//NÃO DIFERE ACENTO circunflexo
                     .replace("ê","e")
-                    .replace("ô","o")
+                    .replace("ô","o")                    
                     ;
                 }
     
         if(texto=="")return transacoes;
 
-        return transacoes.filter(transacao => 
+        let transacoesFiltradas = transacoes.filter((transacao) => 
             {
-                return(
-                    tratarTexto(transacao.categoria).includes(tratarTexto(texto)) ||
+                /*console.log(inteiroParaReal(transacao.valor));
+                console.log(tratarTexto(texto));
+                console.log(inteiroParaReal(transacao.valor).includes(tratarTexto(texto)));*/
+                
+                let resultado = tratarTexto(transacao.categoria).includes(tratarTexto(texto)) ||
                     dateParaTexto(transacao.data).includes(tratarTexto(texto)) ||
                     tratarTexto(transacao.conta.toString()).includes(tratarTexto(texto)) || 
-                    transacao.valor.toString().includes(tratarTexto(texto))
-                );
+                    inteiroParaReal(transacao.valor).includes(tratarTexto(texto));
+
+                    //.log('resultado:'+resultado);
+
+                return resultado;
             });
+
+            //console.log(transacoesFiltradas);
+
+            return transacoesFiltradas;
     }
 
 const PaginaTransacoes = ({
@@ -62,30 +61,31 @@ const PaginaTransacoes = ({
     const [anoSelecionado,setAnoSelecionado] = useState(ano);
     const [filtro,setFiltro] = useState("");
 
+    //SELECIONA AS TRANSAÇÕES DO MÊS
+    let transacoesDoMes = transacoes;
+    if(mesSelecionado!=13){
+        let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);   
+    }
+
     //FILTRA TRANSAÇÕES
-    let transacoesDoMes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);   
-    let transacoesDoMesFiltrado = filtrarTransacao(transacoesDoMes,filtro);
+    let transacoesDoMesFiltrado = filtrarTransacao(transacoesDoMes,filtro)
+
+    
 
     //CATEGORIZA TRANSAÇÕES
     SecaoDia = {title: "", data: ""};
     transacoesCategorizadas = [];
     transacoesDoMesFiltrado.forEach(t => {
-        if(dateParaTexto(t.data)!=SecaoDia.title){
-            if(SecaoDia.title!="")transacoesCategorizadas.push(SecaoDia);
-            SecaoDia = {title: dateParaTexto(t.data), data: [t]};
+        let dataTransacao = dateParaTexto(t.data);
+        
+        if(dataTransacao!=SecaoDia.title){
+            SecaoDia = {title: dataTransacao, data: [t]};
+            if(SecaoDia.title!="")transacoesCategorizadas.push(SecaoDia);     
         }else{
             SecaoDia.data.push(t);
         }
-    }); 
+    });   
     
-    //PREPARA O PICKER MESES
-    let pickersMes = []
-    for(let i=0; i<mesesDoAno.length;i++){
-        pickersMes.push(<Picker.Item    
-                                     label={mesesDoAno[i]}
-                                        value={i} 
-                                        key={i}/>)
-    }
 
     //CALCULA RECEITA DESPESA E BALANÇO
     let receita = inteiroParaReal(estatistica.getReceita(transacoesDoMes));
@@ -96,34 +96,23 @@ const PaginaTransacoes = ({
     let balanco = inteiroParaReal(numeroBalaco)
     if(balanco_E_negativo)balanco = balanco.replace("R$ ","R$ -");
         
-
+    
     return(
         <View style={{flex:1,backgroundColor:"#292616"}}>
-            <View style={{flex:3}}>
+            <View>
                 <Text style={estilo.Titulo}>Assistente Financeiro</Text>
-                <Text style={{color:'white',textAlign:'center'}}>HOJE: {dateParaTexto(new Date())}</Text>
-
-                <View style={{flexDirection:'row',justifyContent:'center'}}>
-                    <Picker 
-                        onValueChange={m =>{setMesSelecionado(m)}}
-                        selectedValue={mesSelecionado}
-                        style={{width:180,backgroundColor:'#808000',}}>
-                        {pickersMes}
-                    </Picker>
-
-                    <TextInput 
-                        value={anoSelecionado.toString()} 
-                        placeholder={anoSelecionado.toString()}
-                        style={{width:64,textAlign:"center",backgroundColor:'#909000'}}
-                        onChangeText={setAnoSelecionado}
-                        onSubmitEditing={()=>selecionarAno(parseInt(anoSelecionado))}
-                        />
-                </View>
+                
+                <SeletorMesAno 
+                    aoMudarMes={m =>{setMesSelecionado(m)}}
+                    aoMudarAno={setAnoSelecionado}
+                    aoConfirmarAno={()=>selecionarAno(parseInt(anoSelecionado))}
+                    mesSelecionado={mesSelecionado} 
+                    anoSelecionado={anoSelecionado}/>                
 
                 <View style={{ display:"flex", flexDirection: "row"}}>
                     <Text style={{flex:1,color:'#007700',textAlign:'center'}}>RECEITA: {"\n"+receita}</Text>
                     <Text style={{flex:1, color:'#d66554',textAlign:'center'}}>DESPESA: {"\n"+despesa}</Text>
-                    <Text style={{flex:1, color:(balanco_E_negativo ? "#FF0000" : '#96c3d9'),textAlign:'center'}}>BALANÇO: {"\n"+balanco}</Text>
+                    <Text style={{flex:1, color:(balanco_E_negativo ? "#AA0000" : '#96c3d9'),textAlign:'center'}}>BALANÇO: {"\n"+balanco}</Text>
                 </View>
                 
                 <Button 
@@ -139,24 +128,27 @@ const PaginaTransacoes = ({
                     />
             </View>
 
-            <TextInput  style={{backgroundColor:"#221122", margin:4,backgroundColor: "black"}}
-                placeholderTextColor="white" 
-                placeholder="Digite uma informacao para filtrar" 
-                onChangeText={t=>{setFiltro(t)}}/>
+            <View>
+                <TextInput  
+                    style={{backgroundColor:"#221122", backgroundColor: "black"}}       placeholderTextColor="white" 
+                    placeholder="Digite uma informacao para filtrar"  
+                    onChangeText={t=>{setFiltro(t)}}/>
+            </View>
                 
-                <SafeAreaView style={{flex:4, backgroundColor:"#221122",margin:4}}>
-                        <SectionList                            
-                            sections={transacoesCategorizadas}
-                            renderSectionHeader={({section: {title}}) => (
-                                <Text style={{fontSize:15,textAlign:'center'}}>{title}</Text>
-                            )}
+            <SafeAreaView style={{flex:1,backgroundColor:"#221122"}}>
+                <Text style={estilo.Subtitulo}>Transacoes</Text>
+                    <SectionList                            
+                        sections={transacoesCategorizadas}
+                        renderSectionHeader={({section: {title}}) => (
+                            <Text style={{fontSize:15,textAlign:'center',marginTop:16}}>{title}</Text>
+                        )}
 
-                            renderItem={({item})=>(
-                                <Transacao 
-                                excluirTransacao={excluirTransacao} 
-                                editarTransacao={irParaPaginaEditarTransacao}
-                                transacao={item}/>)}
-                                />
+                        renderItem={({item})=>(
+                            <Transacao 
+                            excluirTransacao={excluirTransacao} 
+                            editarTransacao={irParaPaginaEditarTransacao}
+                            transacao={item}/>)}
+                            />
             </SafeAreaView>
         </View>
     );
@@ -168,6 +160,11 @@ let estilo = StyleSheet.create({
     },
     Titulo:{
         fontSize: 24,
+        color:"white",
+        textAlign:'center'
+    },
+    Subtitulo:{
+        fontSize: 16,
         color:"white",
         textAlign:'center'
     },  
