@@ -12,30 +12,29 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     const [valor,setValor] = useState(Math.abs(transacaoInicial.valor));
 
 
-    const verificarDados = (seOk,seNaoOk)=>{
+    const verificarDados = (seNegativo)=>{
         let categoriaOk = categoria!="";
         let valorOk = valor!=0;
         let dataOk = new Date(data)!=undefined;
 
         if (categoriaOk && valorOk && dataOk){
             aoSubmeter({
-                categoria:categoria,
-                data: new Date(data), 
+                categoria:categoria.trim(),
+                data: new Date(data),
                 conta: conta,
                 valor: parseInt((eDespesa ? "-" :'')+valor)
-            })
+            });
         }else{
-            seNegativo();
+            throw "PREENCHE DIREITO ESTA MERDA!!!";
         }
     }
 
     const aoPressionarRegistrar = ()=>{
-        let sePostivo = ()=> {}
-
-        let seNegativo = ()=> {alert("PREENCHE DIREITO ESTA MERDA!!!")};
-        
-        
-        verificarDados(sePostivo,seNegativo)        
+        try{
+            verificarDados();
+        }catch(msg){
+            alert(msg);
+        }
     };
 
     //ESTILO DO COMPONENTE
@@ -72,18 +71,17 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     })
 
     
-        let pickersContas = []
-        for(let i=0; i<contas.length;i++)
-        {
-            pickersContas.push(<Picker.Item style={estilo.selecionador} 
-                                            label={contas[i]} 
-                                            value={contas[i]} 
-                                            key={i}/>)
-        }
+    let pickersContas = []
+    for(let i=0; i<contas.length;i++)
+    {
+        pickersContas.push(<Picker.Item style={estilo.selecionador} 
+                                        label={contas[i]} 
+                                        value={contas[i]} 
+                                        key={i}/>)
+    }
 
     return(
     <View>
-
         <View style={estilo.campos}>
             <Text style={estilo.rotulos}>conta</Text>
             <Picker dropdownIconColor={corPadrão}
@@ -107,15 +105,14 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
                     />
 
         <CampoData2 estilo={estilo.campos}
+                    valorInicial={data}
                     aoMudarTexto={setData}
-                    valorInicial={data}                    
                    />
         
         <TouchableOpacity style={estilo.botaoRegistrar} onPress={aoPressionarRegistrar}>
             <Text>REGISTRAR</Text>
         </TouchableOpacity>
-
-    </View>)   
+    </View>);
 }
 
 export default FormularioTransacao;

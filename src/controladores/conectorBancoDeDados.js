@@ -72,7 +72,7 @@ const conectorBancoDeDados =
         return await firestore().runTransaction(async tr => {
             t.conta = firestore().doc("usuarios/"+usuario+"/contas/"+t.conta);
             let TransacaoRef = firestore().collection("usuarios/"+usuario+"/transacoes").doc();
-            await tr.set(TransacaoRef,t);            
+            tr.set(TransacaoRef,t);            
             const estadoAtualConta =  await tr.get(t.conta);
             tr.update(t.conta,{saldo: estadoAtualConta.data().saldo+t.valor})
         })

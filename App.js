@@ -1,4 +1,5 @@
-import React, {Component} from  'react';
+import { useState } from "react";
+import { View, Text } from "react-native";
 import auth, { firebase } from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -19,152 +20,147 @@ import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
 const STACK = createStackNavigator();
 const TAB = createBottomTabNavigator();
 
-export default class App extends Component{
+const App = function () {
 
-  constructor(){
-    super();
- 
-    this.state = {transacoes:[],contas:[],ano:new Date().getFullYear(),carregando:true,login:null};
+  const [transacoes, setTransacoes] = useState([]);
+  const [contas, setContas] = useState([]);
+  const [ano, setAno] = useState(new Date().getFullYear());
+  const [carregando, setCarregando] = useState(true);
+  const [login, setLogin] = useState(null);
 
-    this.buscarSaldoTransacoes = this.buscarSaldoTransacoes.bind(this);
-  }
 
-  buscarSaldoTransacoes(anoTr = new Date().getFullYear())
-  {
-    this.setState({carregando:true});
+  function buscarSaldoTransacoes(anoTr = new Date().getFullYear()) {
+    setCarregando(true);
 
-    let contas,transacoes;
-    let atualizaState = ()=>{this.setState({contas:contas, transacoes:transacoes, ano:anoTr, carregando:false})};
-    
+    let contasRecuperadas, transacoesRecuperadas;
+
+    const atualizaState = () => {
+      setContas(contasRecuperadas);
+      setTransacoes(transacoesRecuperadas);
+      setAno(anoTr);
+      setCarregando(false);
+    };
+
     conectorBancoDeDados.getContas()
-    .then(c => {
-      contas = c;
-      if(transacoes!=undefined)atualizaState();
-    })
-    .catch(()=>{
-      alert("Falha ao acessar o banco de dados de transações")
-    });
+      .then(c => {
+        contasRecuperadas = c;
+        if (transacoesRecuperadas != undefined) atualizaState();
+      })
+      .catch(() => {
+        alert("Falha ao acessar o banco de dados de transações")
+      });
 
     conectorBancoDeDados.getTransacoes(anoTr)
-    .then(t =>{
-      transacoes=t;
-      if(contas!=undefined)atualizaState();
-    })
-    .catch(()=>{
-      alert("Falha ao acessar o banco de dados de contas")
-    });
-  }
-  
-  render()
-  {
-    //return (<Paginateste/>)
-
-    //PAGINAS DE CRUD DE TRANSACOES
-    let AbaTransacoes = () => {
-
-      let IniciaPaginaTransacoes = ({navigation})=>{
-        return (
-          <PaginaTransacoes
-            transacoes={this.state.transacoes} 
-            contas={this.state.contas} 
-            ano={this.state.ano}
-            selecionarAno={a =>{this.buscarSaldoTransacoes(a);}}
-            irParaPaginaNovaTransacao={(d)=>{navigation.navigate("PaginaNovaTransacao",{eDespesa: d})}} 
-            irParaPaginaEditarTransacao={(id)=>{navigation.navigate("PaginaEditarTransacao",{id:id})}}
-            excluirTransacao={(id)=>{
-              conectorBancoDeDados.excluirTransacao(id)
-              .then(this.buscarSaldoTransacoes)
-            }} 
-          />
-        ); 
-      }
-
-      let IniciaPaginaNovaTransacoes = ({route})=>{
-        return (
-          <PaginaNovaTransacao 
-            novaTransacao={t =>{
-              conectorBancoDeDados.inserirTransacao(t)
-              .then(()=>{this.buscarSaldoTransacoes()})
-            }}
-            nomeContas={this.state.contas.map(d => d.id)}
-            eDespesa={route.params.eDespesa}
-          />
-        );
-      }
-
-      let IniciaPaginaEditarTransacao = ({route})=>{
-        let transacaoInicial = this.state.transacoes.find(t=>t.id==route.params.id);
-
-        return (
-          <PaginaEditarTransacao 
-          atualizarTransacao={t =>{
-            conectorBancoDeDados.atualizarTransacao(t)
-            .then(this.buscarSaldoTransacoes)
-          }}
-          nomeContas={this.state.contas.map(d => d.id)}
-          transacaoInicial={transacaoInicial}
-        />
-        );
-      }
-
-      return(
-        <STACK.Navigator initialRouteName='Inicial' screenOptions={{headerShown: false}}>
-          <STACK.Screen name='Inicial' component={IniciaPaginaTransacoes} />
-          <STACK.Screen name='PaginaNovaTransacao' component={IniciaPaginaNovaTransacoes} />
-          <STACK.Screen name='PaginaEditarTransacao' component={IniciaPaginaEditarTransacao}/>
-        </STACK.Navigator>
-      );
-    }
-
-    //PAGINAS DE CRUD DE CONTAS
-    let AbaContas = () => {
-      return(
-        <PaginaContas 
-          contas={this.state.contas}
-          transacoes={this.state.transacoes}
-          tranferirEntreContas={(contaOrigem,contaDestino,valor)=>{
-            conectorBancoDeDados.transferirEntreContas(contaOrigem,contaDestino,valor)
-            .then(()=>{this.buscarSaldoTransacoes()})
-          }}
-        />
-      )
-    }
-
-    //PÁGINA ESTATISTICA
-    let AbaEstatistica = ()=> {
-      return(
-        <PaginaEstatistica 
-          ano={this.state.ano} 
-          transacoes={this.state.transacoes}
-          selecionarAno={a =>{this.buscarSaldoTransacoes(a);}}
-          />
-      )
-    }
-
-    //NAVEGAÇÃO POR ABAS
-    let telaNavegacaoTab = () => {
-      return(
-        <NavigationContainer>
-          <TAB.Navigator initialRouteName='transacoes' screenOptions={{headerShown: false}}>
-            <TAB.Screen name='transacoes' component={AbaTransacoes}/>
-            <TAB.Screen name='contas' component={AbaContas}/>
-            <TAB.Screen name='estatistica' component={AbaEstatistica}/>
-          </TAB.Navigator>
-        </NavigationContainer>
-      );
-    }
-
-    if(this.state.login==null)
-    {return <PaginaLogin onLogin={l=>{this.setState({login:l});this.buscarSaldoTransacoes()}}/>;}
-        
-    if(this.state.carregando)return <PaginaCarregando/>;
-
-    return telaNavegacaoTab();
+      .then(t => {
+        transacoesRecuperadas = t;
+        if (contasRecuperadas != undefined) atualizaState();
+      })
+      .catch(() => {
+        alert("Falha ao recuperar Contas e Transações");
+      });
   }
 
-  componentWillUnmount(){
-    //LOGOUT ANTES DE FECHAR O APP
-    if(this.state.login!=null)auth().signOut().then(()=>{firebase.firestore().terminate()}); 
+  //PÁGINAS
+  function IniciaPaginaTransacoes() {
+    return <PaginaTransacoes
+      transacoes={transacoes}
+      contas={contas}
+      ano={ano}
+      selecionarAno={a => { buscarSaldoTransacoes(a); }}
+      excluirTransacao={(id) => {
+        conectorBancoDeDados.excluirTransacao(id)
+          .then(buscarSaldoTransacoes)
+      }} />
   }
 
+  function IniciaPaginaNovaTransacoes({ route }) {
+    return (
+      <PaginaNovaTransacao
+        novaTransacao={t => {
+          conectorBancoDeDados.inserirTransacao(t)
+            .then(() => { buscarSaldoTransacoes() })
+        }}
+        nomeContas={contas.map(d => d.id)}
+        eDespesa={route.params.eDespesa}
+      />
+    );
+  }
+
+  function IniciaPaginaEditarTransacao({ route }) {
+    let transacaoInicial = transacoes.find(t => t.id == route.params.id);
+
+    return (
+      <PaginaEditarTransacao
+        atualizarTransacao={t => {
+          conectorBancoDeDados.atualizarTransacao(t)
+            .then(buscarSaldoTransacoes)
+        }}
+        nomeContas={contas.map(d => d.id)}
+        transacaoInicial={transacaoInicial}
+      />
+    );
+  }
+
+  //ABAS
+  function AbaTransacoes() {
+    return (
+      <STACK.Navigator initialRouteName='Inicial' screenOptions={{ headerShown: false }}>
+        <STACK.Screen name='Inicial'>{IniciaPaginaTransacoes}</STACK.Screen>
+        <STACK.Screen name='PaginaNovaTransacao' component={IniciaPaginaNovaTransacoes} />
+        <STACK.Screen name='PaginaEditarTransacao' component={IniciaPaginaEditarTransacao} />
+      </STACK.Navigator>
+    );
+  }
+
+  function AbaContas() {
+    return (
+      <PaginaContas
+        contas={contas}
+        transacoes={transacoes}
+        tranferirEntreContas={(contaOrigem, contaDestino, valor) => {
+          conectorBancoDeDados.transferirEntreContas(contaOrigem, contaDestino, valor)
+            .then(() => { buscarSaldoTransacoes() })
+        }}
+      />
+    )
+  }
+
+  function AbaEstatistica() {
+    return (
+      <PaginaEstatistica
+        ano={ano}
+        transacoes={transacoes}
+        selecionarAno={a => { buscarSaldoTransacoes(a); }}
+      />
+    )
+  }
+
+  function telaNavegacaoTab() {
+    return (
+      <NavigationContainer>
+        <TAB.Navigator initialRouteName='transacoes' screenOptions={{ headerShown: false }}>
+          <TAB.Screen name='transacoes' component={AbaTransacoes} />
+          <TAB.Screen name='contas' component={AbaContas} />
+          <TAB.Screen name='estatistica' component={AbaEstatistica} />
+        </TAB.Navigator>
+      </NavigationContainer>
+    );
+  }
+
+  if (login == null) {
+    return <PaginaLogin onLogin={l => {
+      setLogin(l);
+      buscarSaldoTransacoes();
+    }
+    } />;
+  }
+
+  if (carregando) return <PaginaCarregando />;
+
+  return telaNavegacaoTab();
+
+  //LOGOUT ANTES DE FECHAR O APP
+  //if (login != null) auth().signOut().then(() => firebase.firestore().terminate());
 }
+
+export default App;

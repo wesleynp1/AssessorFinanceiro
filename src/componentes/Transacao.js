@@ -1,8 +1,14 @@
-import { View,Text, TouchableOpacity, Alert, StyleSheet } from "react-native"
-import {inteiroParaReal} from "./CampoDinheiro"
+import { View,Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
+import {inteiroParaReal} from "./CampoDinheiro";
+import { useNavigation } from '@react-navigation/native';
 
 //EXIBE AS INFORMAÇÕES SOBRE A TRANSAÇÃO
-const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
+
+//const navegador = useNavigation();
+
+const Transacao = ({transacao, excluirTransacao})=>{
+
+    const navegador = useNavigation();
 
     const ConfirmarExcluirTransacao = ()=>{
             Alert.alert(
@@ -19,7 +25,7 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
                     }
                 ]
                 );
-        }
+    }
 
     return(
     <View style={{flexDirection: 'row',backgroundColor:(transacao.valor<0 ? "#660b0bff" :'#085221ff'), margin:8}}>
@@ -41,7 +47,7 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
             </TouchableOpacity>
 
             <TouchableOpacity style={estilo.botaoEditar} 
-                                onPress={()=>{editarTransacao(transacao.id)}}>
+                                onPress={ ()=>{navegador.navigate("PaginaEditarTransacao",{id:transacao.id})} }>
                 <Text style={{fontSize:15,color:"black"}}>📝️</Text>
             </TouchableOpacity>
         </View>
