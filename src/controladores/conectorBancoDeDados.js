@@ -144,7 +144,29 @@ const conectorBancoDeDados =
         })
         .then(()=>{Alert.alert("Sucesso!","Transação excluida com sucesso!")})
         .catch(e=>{Alert.alert("Erro","Erro ao excluir a transacao\nmotivo:"+e)})
-    }    
+    },
+
+    //CRUD LANCAMENTOS
+    inserirLancamentos: async (novoLancamento)=>{        
+        firestore()
+        .collection("usuarios/"+usuario+"/lancamentos")
+        .add(novoLancamento)        
+    },
+    getLancamentos: async ()=>{
+        return firestore()
+        .collection("usuarios/"+usuario+"/lancamentos")
+        .orderBy("data","desc")
+        .get()
+        .then(
+            query => query.docs.map(
+                doc =>{
+                    let documento = doc.data()
+                    documento.data = doc.data().data.toDate();
+                    return documento;
+                }
+            )
+        )
+    }
 }
 
 export default conectorBancoDeDados;

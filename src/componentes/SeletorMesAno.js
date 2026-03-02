@@ -32,8 +32,6 @@ export const SeletorMesAno = ({aoMudarMes,aoMudarAno,mesSelecionado,anoSeleciona
                     value={13} 
                     key={13}/>);
 
-    console.log(mesSelecionado);
-
     return (
         <View style={estilo.container}>
             <Picker 

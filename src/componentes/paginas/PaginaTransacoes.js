@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { View, Text, Button, SafeAreaView, StyleSheet, SectionList } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, SectionList } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 //COMPONENTES PRÓPRIOS
 import { SeletorMesAno } from "../SeletorMesAno.js";
@@ -39,14 +40,11 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
         return transacoesCategorizadas;
     }
 
-    //FILTRA AS TRANSAÇÕES DO MÊS
-    {
-        if (mesSelecionado != 13) {//ANUAL
-            transacoes = transacoes.filter(t => t.data.getMonth() == mesSelecionado);
-        } else {
-            transacoes = transacoes;
-        }
+    //FILTRA AS TRANSAÇÕES DO MÊS    
+    if (mesSelecionado != 13) {//ANUAL
+        transacoes = transacoes.filter(t => t.data.getMonth() == mesSelecionado);
     }
+    
 
     //Filtra conforme busca do usuário
     if (filtro) {
@@ -54,17 +52,95 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
     }  
     
     //CALCULA RECEITA DESPESA E BALANÇO
-    let receita = inteiroParaReal(estatistica.getReceita(transacoes));
-    let despesa = inteiroParaReal(estatistica.getDespesa(transacoes));
 
-    let numeroBalaco = estatistica.getBalanco(transacoes)
-    let balanco_E_negativo = numeroBalaco < 0
-    let balanco = inteiroParaReal(numeroBalaco)
-    if (balanco_E_negativo) balanco = balanco.replace("R$ ", "R$ -");
+    let numeroBalaco = estatistica.getBalanco(transacoes);
+    let balancoNegativo = numeroBalaco < 0;
 
-
+    //ESTILO
+    const estilo = StyleSheet.create({
+        Pagina: {
+            flex: 1, 
+            backgroundColor: "#292616"
+        },
+        Titulo: {
+            fontSize: 24,
+            color: "white",
+            textAlign: 'center'
+        },
+        Subtitulo: {
+            fontSize: 16,
+            color: "white",
+            textAlign: 'center'
+        },
+        Texto: {
+            fontSize: 15,
+            color: "black",
+            textAlign: 'center'
+        },
+        Quadro: {
+            flex: 1,
+            margin: 5,
+            backgroundColor: "#292616",
+            borderColor: "black",
+            borderStyle: "solid",
+            borderWidth: 2,
+        },
+        DataSecao: {
+            fontSize: 15, 
+            textAlign: 'center', 
+            marginTop: 16 
+        },
+        AreaTransacoes:{
+            flex: 1, 
+            backgroundColor: "#221122" 
+        },
+        Receita:{ 
+            flex: 1, 
+            textAlign: 'center', 
+            color: '#007700' 
+        },
+        Despesa:{ 
+            flex: 1, 
+            textAlign: 'center', 
+            color: '#d66554' 
+        },
+        Balanco:{ 
+            flex: 1, 
+            textAlign: 'center',
+            color: (balancoNegativo ? "#AA0000" : '#96c3d9')
+        },
+        ContainerBotoes:{
+            display: "flex",
+            flexDirection:"row",        
+            backgroundColor:"yellow",
+            marginTop:4,
+            marginBottom:4,
+        },
+        BotaoReceita:{
+            flex:1,        
+            alignItems:"center",
+            padding: 12,
+            backgroundColor:"#064d06"
+        },
+        BotaoDespesa:{
+            flex:1,        
+            alignItems:"center",
+            padding: 12,
+            backgroundColor:"#6b1610"
+        },
+        TextBotoes:{
+            fontSize:16
+        },
+        BarraPesquisa:{
+            backgroundColor: "#221122", 
+            borderColor: "white",
+            borderStyle: "solid",
+            borderWidth: 1
+        }
+    });
+        
     return (
-        <View style={{ flex: 1, backgroundColor: "#292616" }}>
+        <View style={estilo.Pagina}>
             <View>
                 <Text style={estilo.Titulo}>Assistente Financeiro</Text>
 
@@ -76,37 +152,43 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
                     anoSelecionado={anoSelecionado} />
 
                 <View style={{ display: "flex", flexDirection: "row" }}>
-                    <Text style={{ flex: 1, color: '#007700', textAlign: 'center' }}>RECEITA: {"\n" + receita}</Text>
-                    <Text style={{ flex: 1, color: '#d66554', textAlign: 'center' }}>DESPESA: {"\n" + despesa}</Text>
-                    <Text style={{ flex: 1, color: (balanco_E_negativo ? "#AA0000" : '#96c3d9'), textAlign: 'center' }}>BALANÇO: {"\n" + balanco}</Text>
+                    <Text style={estilo.Receita}>RECEITA: {"\n" + inteiroParaReal(estatistica.getReceita(transacoes))}</Text>
+                    <Text style={estilo.Despesa}>DESPESA: {"\n" + inteiroParaReal(estatistica.getDespesa(transacoes))}</Text>
+                    <Text style={estilo.Balanco}>BALANÇO: {"\n" + inteiroParaReal(numeroBalaco)}</Text>
                 </View>
 
-                <Button
-                    title={"registrar nova receita"}
-                    color={"green"}
-                    onPress={() => navegador.navigate("PaginaNovaTransacao", { eDespesa: false })}
-                />
-
-                <Button
-                    color={"red"}
-                    onPress={() => navegador.navigate("PaginaNovaTransacao", { eDespesa: true })}
-                    title={"registrar nova despesa"}
-                />
+                <View style={estilo.ContainerBotoes}>                    
+                    <TouchableOpacity         
+                        style={estilo.BotaoReceita}       
+                        onPress={() => navegador.navigate("PaginaNovaTransacao", { eDespesa: false })}
+                    >
+                        <Text style={estilo.TextBotoes}>Nova Receita</Text>
+                    </TouchableOpacity>
+                
+                    <TouchableOpacity                   
+                        style={estilo.BotaoDespesa}    
+                        onPress={() => navegador.navigate("PaginaNovaTransacao", { eDespesa: true })}
+                        title={"nova despesa"}
+                    >
+                        <Text style={estilo.TextBotoes}>Nova Despesa</Text>
+                    </TouchableOpacity>                    
+                </View>
             </View>
 
+            {/* BARRA DE PESQUISA */}
             <View>
                 <TextInput
-                    style={{ backgroundColor: "#221122", backgroundColor: "black" }} placeholderTextColor="white"
+                    style={estilo.BarraPesquisa} placeholderTextColor="white"
                     placeholder="Digite uma informacao para filtrar"
                     onChangeText={t => { setFiltro(t) }} />
             </View>
 
-            <SafeAreaView style={{ flex: 1, backgroundColor: "#221122" }}>
+            <SafeAreaView style={estilo.AreaTransacoes}>
                 <Text style={estilo.Subtitulo}>Transacoes</Text>
                 <SectionList
                     sections={categorizaTransacoes()}
                     renderSectionHeader={({ section: { title } }) => (
-                        <Text style={{ fontSize: 15, textAlign: 'center', marginTop: 16 }}>{title}</Text>
+                        <Text style={estilo.DataSecao}>{title}</Text>
                     )}
 
                     renderItem={({ item }) => (
@@ -119,33 +201,6 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
     );
 }
 
-let estilo = StyleSheet.create({
-    Pagina: {
-        padding: 16
-    },
-    Titulo: {
-        fontSize: 24,
-        color: "white",
-        textAlign: 'center'
-    },
-    Subtitulo: {
-        fontSize: 16,
-        color: "white",
-        textAlign: 'center'
-    },
-    Texto: {
-        fontSize: 15,
-        color: "black",
-        textAlign: 'center'
-    },
-    Quadro: {
-        flex: 1,
-        margin: 5,
-        backgroundColor: "#292616",
-        borderColor: "black",
-        borderStyle: "solid",
-        borderWidth: 2,
-    },
-});
+
 
 export default PaginaTransacoes

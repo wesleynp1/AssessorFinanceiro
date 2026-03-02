@@ -41,7 +41,7 @@ export const inteiroParaReal = (numero)=>{
 
     let n = Math.abs(numero);
 
-    let rs = numero>=0 ? "R$ " : "R$ -";
+    let rs = numero>=0 ? "R$ +" : "R$ -";
 
     if(n<10) //1 algarismo
     {

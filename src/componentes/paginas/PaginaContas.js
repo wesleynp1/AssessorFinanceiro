@@ -1,5 +1,6 @@
 import {useState} from "react";
-import {View, Text, SafeAreaView, FlatList, StyleSheet, Button, Modal} from "react-native";
+import {View, Text, FlatList, StyleSheet, Button, Modal} from "react-native";
+import {SafeAreaView} from "react-native-safe-area-context";
 import {inteiroParaReal} from "../CampoDinheiro";
 import ModalTransferencia from "../ModalTransferencia";
 
@@ -10,10 +11,9 @@ const PaginaContas = ({contas, tranferirEntreContas})=>{
     let saldoTotal = 0
     contas.forEach(c =>{saldoTotal+=c.saldo});
 
-    let hoje = new Date();
-    let ultimoDiaDesteMes = new Date(hoje.getFullYear(),hoje.getMonth()+1,0);
-    let diasRestantesAteFimDoMes = ultimoDiaDesteMes.getDate()-hoje.getDate();
-    let saldoDiaAteFimDoMes = saldoTotal/diasRestantesAteFimDoMes;
+    let hoje = new Date();    
+    let diasRestantesAteFimDoMes = (new Date(hoje.getFullYear(),hoje.getMonth()+1,0).getDate())-hoje.getDate();
+    let saldoDiaAteFimDoMes = saldoTotal/(diasRestantesAteFimDoMes>0 ? diasRestantesAteFimDoMes : 1);
 
     let IniciaConta =  ({item}) => {
         return(

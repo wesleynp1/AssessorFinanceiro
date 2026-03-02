@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
-import auth, { firebase } from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-//import Icon from "@react-native-vector-icons/fontawesome";
 
 //PÁGINAS
 import PaginaTransacoes from './src/componentes/paginas/PaginaTransacoes';
@@ -14,6 +11,7 @@ import PaginaContas from './src/componentes/paginas/PaginaContas';
 import PaginaEstatistica from './src/componentes/paginas/PaginaEstatisticas';
 import PaginaLogin from './src/componentes/paginas/PaginaLogin';
 import PaginaCarregando from './src/componentes/paginas/PaginaCarregando';
+import PaginaLancamento from './src/componentes/paginas/PaginaLancamentos';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
 
@@ -133,15 +131,16 @@ const App = function () {
         selecionarAno={a => { buscarSaldoTransacoes(a); }}
       />
     )
-  }
+  }   
 
   function telaNavegacaoTab() {
     return (
       <NavigationContainer>
         <TAB.Navigator initialRouteName='transacoes' screenOptions={{ headerShown: false }}>
-          <TAB.Screen name='transacoes' component={AbaTransacoes} />
-          <TAB.Screen name='contas' component={AbaContas} />
-          <TAB.Screen name='estatistica' component={AbaEstatistica} />
+          <TAB.Screen name='Transações' component={AbaTransacoes} />
+          <TAB.Screen name='Contas' component={AbaContas} />
+          <TAB.Screen name='Estatística' component={AbaEstatistica} />
+          <TAB.Screen name='Crédito' component={PaginaLancamento} />
         </TAB.Navigator>
       </NavigationContainer>
     );

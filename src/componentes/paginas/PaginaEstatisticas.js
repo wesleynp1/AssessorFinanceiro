@@ -1,40 +1,14 @@
 import { useState } from "react";
-import { SafeAreaView ,View,Text, StyleSheet, FlatList} from "react-native"
-import {Picker} from '@react-native-picker/picker';
-import estatistica from "../../controladores/estatistica";
+import { SafeAreaView ,View,Text, StyleSheet, FlatList} from "react-native";
 
-import { TextInput } from "react-native-gesture-handler";
-
-import {SeletorMesAno}  from "../SeletorMesAno.js";
+import estatistica         from "../../controladores/estatistica";
+import { SeletorMesAno }   from "../SeletorMesAno.js";
 import { inteiroParaReal } from "../CampoDinheiro";
-
-const mesesDoAno = [
-    "Janeiro", 
-    "Fevereiro", 
-    "Março", 
-    "Abril", 
-    "Maio", 
-    "Junho", 
-    "Julho", 
-    "Agosto", 
-    "Setembro", 
-    "Outubro", 
-    "Novembro", 
-    "Dezembro",
-    "ANUAL"
-]
-
-let eDespesa = true;
 
 const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
     const [anoSelecionado,setAnoSelecionado] = useState(ano);
-
-    let pickersMes = []
-    for(let i=0; i<mesesDoAno.length;i++){
-        pickersMes.push(<Picker.Item label={mesesDoAno[i]} value={i} key={i}/>)
-    }
 
     if(mesSelecionado!=13){//SE NÃO FOR O ANUAL
         transacoes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);
@@ -44,6 +18,10 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
     let despesaTotal = estatistica.getDespesa(transacoes);
     
     let categorias =  estatistica.getValorPorCategorias(transacoes);
+
+    let receitaLiquida = estatistica.getReceitaLiquida(transacoes);
+    let despesaLiquida = estatistica.getDespesaLiquida(transacoes);
+    let balanco = receitaLiquida + despesaLiquida;
     
     const renderCategorias = (vc)=>{
         
@@ -69,9 +47,38 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
         )
     }
 
-    let receitaLiquida = estatistica.getReceitaLiquida(transacoes);
-    let despesaLiquida = estatistica.getDespesaLiquida(transacoes);
-    let balanco = receitaLiquida + despesaLiquida;
+    const estilo = StyleSheet.create({
+        Pagina:{
+            flex:1,
+            backgroundColor: '#333232ff'
+        },
+
+        Titulo:{
+            color:"white",
+            textAlign:"center",
+            fontSize:24
+        },
+        Texto:{
+            fontSize: 12,
+            color:"white",
+            textAlign:'center'
+        },
+        Quadro: {
+            flex:1,
+            flexDirection: 'row',
+            margin:2,
+            borderColor:"black",
+            borderStyle:"solid",
+            borderWidth:2,
+        },
+
+        Categorias:{
+            flex:1,
+            fontSize: 20,
+            color:"white",
+            textAlign:'center'
+        }
+    });
 
     return(
         <View style={estilo.Pagina}>
@@ -108,45 +115,11 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
                 <FlatList 
                     ListHeaderComponent={renderCabeçalhoCategoria()}
                     data={categorias}
-                    renderItem={({item})=>renderCategorias(item)}/>                    
-                    
+                    renderItem={({item})=>renderCategorias(item)}/>
             </SafeAreaView>
 
         </View>
         )
 }
-
-const estilo = StyleSheet.create({
-    Pagina:{
-        flex:1,
-        backgroundColor: '#333232ff'
-    },
-
-    Titulo:{
-        color:"white",
-        textAlign:"center",
-        fontSize:24
-    },
-    Texto:{
-        fontSize: 12,
-        color:"white",
-        textAlign:'center'
-    },
-    Quadro: {
-        flex:1,
-        flexDirection: 'row',
-        margin:2,
-        borderColor:"black",
-        borderStyle:"solid",
-        borderWidth:2,
-    },
-
-    Categorias:{
-        flex:1,
-        fontSize: 20,
-        color:"white",
-        textAlign:'center'
-    }
-});
 
 export default PaginaEstatistica

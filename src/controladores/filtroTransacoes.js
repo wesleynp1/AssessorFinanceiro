@@ -23,7 +23,7 @@ const filtrarTransacao = function (transacoes, texto){
             tratarTexto(transacao.categoria).includes(tratarTexto(texto)) ||
             dateParaTexto(transacao.data).includes(tratarTexto(texto)) ||
             tratarTexto(transacao.conta.toString()).includes(tratarTexto(texto)) ||
-            inteiroParaReal(transacao.valor).includes(tratarTexto(texto))
+            inteiroParaReal(transacao.valor).toLowerCase().includes(tratarTexto(texto))
         );
     });
 
