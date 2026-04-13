@@ -146,26 +146,61 @@ const conectorBancoDeDados =
         .catch(e=>{Alert.alert("Erro","Erro ao excluir a transacao\nmotivo:"+e)})
     },
 
-    //CRUD LANCAMENTOS
-    inserirLancamentos: async (novoLancamento)=>{        
+    //CRUD FATURAS
+    inserirFatura: async (novaFatura)=>{     
+        novaFatura.contaPagamento = firestore().doc("usuarios/"+usuario+"/contas/"+novaFatura.contaPagamento);
+
         firestore()
-        .collection("usuarios/"+usuario+"/lancamentos")
-        .add(novoLancamento)        
+        .collection("usuarios/"+usuario+"/faturas")
+        .add(novaFatura)        
     },
-    getLancamentos: async ()=>{
-        return firestore()
-        .collection("usuarios/"+usuario+"/lancamentos")
-        .orderBy("data","desc")
+    getFaturas: async ()=>{
+        let faturas = firestore()
+        .collection("usuarios/"+usuario+"/faturas")
         .get()
-        .then(
-            query => query.docs.map(
-                doc =>{
-                    let documento = doc.data()
-                    documento.data = doc.data().data.toDate();
-                    return documento;
-                }
-            )
+        .then( query => {
+                return query.docs.map( doc => {                    
+                        let fatura = doc.data(); 
+                        fatura.id = doc.id;
+                        fatura.dataPagamento  = fatura.dataPagamento.toDate();
+                        fatura.contaPagamento = fatura.contaPagamento._documentPath._parts[3];
+                        fatura.lancamentos = []
+                        return fatura;
+                    });
+            }
         )
+        .then( async faturas => {
+
+            for(let fatura of faturas){
+                let lancamentos = (await firestore().collection("usuarios/"+usuario+"/faturas/"+fatura.id+"/lancamentos").get()).docs;
+
+                for(lancamento of lancamentos){
+                    let id = lancamento.id
+                    lancamento = lancamento.data();
+                    lancamento.id = id;
+                    lancamento.data = lancamento.data.toDate();
+
+                    fatura.lancamentos.push(lancamento);
+                }                
+            };
+
+            return faturas;
+        })
+        .catch(erro => alert("erro ao buscar faturas:"+erro));        
+
+        return faturas;
+    },
+    deletarFatura: async (id)=>{
+        console.log("deletando "+id)
+        firestore().doc("usuarios/"+usuario+"/faturas/"+id).delete();
+    },
+    
+    //CRUD LANÇAMENTOS
+    inserirLancamento: (novoLancamento,faturaId)=>{
+        return firestore().collection("usuarios/"+usuario+"/faturas/"+faturaId+"/lancamentos").add(novoLancamento);
+    },
+    deletarLancamento: (id,faturaId)=>{
+        return firestore().doc("usuarios/"+usuario+"/faturas/"+faturaId+"/lancamentos/"+id).delete()
     }
 }
 

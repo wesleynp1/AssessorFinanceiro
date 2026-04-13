@@ -11,7 +11,7 @@ import PaginaContas from './src/componentes/paginas/PaginaContas';
 import PaginaEstatistica from './src/componentes/paginas/PaginaEstatisticas';
 import PaginaLogin from './src/componentes/paginas/PaginaLogin';
 import PaginaCarregando from './src/componentes/paginas/PaginaCarregando';
-import PaginaLancamento from './src/componentes/paginas/PaginaLancamentos';
+import PaginaFatura from './src/componentes/paginas/PaginaFatura';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
 
@@ -75,6 +75,7 @@ const App = function () {
     return (
       <PaginaNovaTransacao
         novaTransacao={t => {
+          setCarregando(true);
           conectorBancoDeDados.inserirTransacao(t)
             .then(() => { buscarSaldoTransacoes() })
         }}
@@ -116,6 +117,7 @@ const App = function () {
         contas={contas}
         transacoes={transacoes}
         tranferirEntreContas={(contaOrigem, contaDestino, valor) => {
+          setCarregando(true);
           conectorBancoDeDados.transferirEntreContas(contaOrigem, contaDestino, valor)
             .then(() => { buscarSaldoTransacoes() })
         }}
@@ -140,7 +142,7 @@ const App = function () {
           <TAB.Screen name='Transações' component={AbaTransacoes} />
           <TAB.Screen name='Contas' component={AbaContas} />
           <TAB.Screen name='Estatística' component={AbaEstatistica} />
-          <TAB.Screen name='Crédito' component={PaginaLancamento} />
+          <TAB.Screen name='Crédito' component={PaginaFatura} />
         </TAB.Navigator>
       </NavigationContainer>
     );

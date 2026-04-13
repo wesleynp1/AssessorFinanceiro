@@ -4,7 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 
 //EXIBE AS INFORMAÇÕES SOBRE A TRANSAÇÃO
 
-//const navegador = useNavigation();
+/**
+ * @param transacao : {conta : string , categoria : string, valor : number, data : Date}
+ */
 
 const Transacao = ({transacao, excluirTransacao})=>{
 
@@ -32,7 +34,7 @@ const Transacao = ({transacao, excluirTransacao})=>{
 
         <View style={{flex: 8,flexDirection: 'row', justifyContent: 'space-between' }}>
             <View style={{flexDirection: "column"}}>
-                <Text style={{fontSize:20}}>{transacao.conta} </Text>
+                 {transacao?.conta && <Text style={{fontSize:20}}>{transacao.conta} </Text>}
                 <Text style={{fontSize:20}}>{transacao.categoria} </Text>
             </View>
             <Text style={{fontSize:20}}>{inteiroParaReal(transacao.valor)}</Text>
@@ -45,11 +47,11 @@ const Transacao = ({transacao, excluirTransacao})=>{
             >
                 <Text style={{fontSize:15,color:"white"}}>❌️</Text>
             </TouchableOpacity>
-
+                        
             <TouchableOpacity style={estilo.botaoEditar} 
                                 onPress={ ()=>{navegador.navigate("PaginaEditarTransacao",{id:transacao.id})} }>
                 <Text style={{fontSize:15,color:"black"}}>📝️</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>            
         </View>
 
     </View>

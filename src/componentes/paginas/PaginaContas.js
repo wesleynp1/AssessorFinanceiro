@@ -55,7 +55,7 @@ const PaginaContas = ({contas, tranferirEntreContas})=>{
                 visivel={modalVisivel}
                 contas={contas} 
                 tranferirEntreContas={tranferirEntreContas}
-                fecharModal={setModalVisivel}
+                fecharModal={()=>setModalVisivel(false)}
                 />
         </View>
     );

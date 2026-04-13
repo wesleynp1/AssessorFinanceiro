@@ -139,8 +139,8 @@ android {
         applicationId "com.assessorfinanceiro"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 18
-        versionName "Repaginada no app"
+        versionCode 20
+        versionName "Repaginada no app 3 e início das Faturas e Lançamentos BETA"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
         if (isNewArchitectureEnabled()) {

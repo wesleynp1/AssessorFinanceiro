@@ -25,11 +25,12 @@ const ModalTransferencia = ({contas, tranferirEntreContas, fecharModal, visivel}
         animationType="fade"
         visible={visivel}
         transparent={true}
-        onRequestClose={() =>{fecharModal(false)}}
+        onRequestClose={fecharModal}
         >
-            <TouchableOpacity style={estilo.Modal} onPress={()=>{fecharModal(false)}}>
+            <View style={estilo.Modal}>
+                <Text style={estilo.BotaoFechar} onPress={fecharModal}>X</Text>
                 <View style={estilo.Formulario}>
-                    <Text style={estilo.Texto}>insira as informações</Text>
+                    <Text style={estilo.Titulo}>Insira as informações</Text>
 
                     <Text>De:</Text>
                     <Picker 
@@ -54,54 +55,42 @@ const ModalTransferencia = ({contas, tranferirEntreContas, fecharModal, visivel}
                         valorInicial={valor}
                         estilo={estilo.CampoDinheiro}
                     />
-
-                    <Button 
-                        title="Transferir entre contas" 
-                        onPress={()=>{tranferirEntreContas(contaOrigem,contaDestino,valor)}}
-                    />
+                    
+                    <TouchableOpacity style={estilo.BotaoTransferir} onPress={()=>{tranferirEntreContas(contaOrigem,contaDestino,valor)}}>
+                        <Text>TRANSFERIR</Text>
+                    </TouchableOpacity>
 
                     <Button 
                         title="Cancelar" 
                         color={"#AA0000"}
-                        onPress={()=>{fecharModal(false)}}
+                        onPress={fecharModal}
                         />
                 </View>
-            </TouchableOpacity>
+            </View>
         </Modal>
         )
 }
 
 let estilo = StyleSheet.create({
-    Pagina:{
-        padding: 16
-    },
     Titulo:{
-        fontSize: 24,
-        color:"black",
-        textAlign:'center'
-    },  
-    Texto:{
-        fontSize: 15,
-        color:"black",
-        textAlign:'center'
-    },
-    Quadro: {  
-        flex:1,
-        backgroundColor: "#AAAACC",
-        borderColor:"black",
-        borderStyle:"solid",
-        borderWidth:2,
+        fontSize: 24,        
+        textAlign:'center',
+        marginBottom: 16
     },
     Modal:{
         flex: 1,
-        backgroundColor:'#2020207a',
+        backgroundColor:'#000000b4',
+        justifyContent: "center"
     },
     Formulario: {
-        maxHeight:300,
-        maxWidth:300,
-        margin: 'auto',
-        backgroundColor: '#3b3b3bff',
-        alignSelf: 'center'
+        backgroundColor: 'rgba(59, 59, 59, 0.96)',
+        alignSelf: 'center',
+        paddingLeft: 32,
+        paddingRight: 32,
+        paddingBottom: 32,
+        borderWidth: 1,
+        borderColor: "#FFF",
+        borderRadius: 16,
     },
     CampoDinheiro: {
         backgroundColor: "gray", 
@@ -113,6 +102,19 @@ let estilo = StyleSheet.create({
         width:180,
         alignSelf:"center",
         backgroundColor:'#808000',
+        marginBottom: 4
+    },
+    BotaoTransferir:{   
+        alignItems:"center",
+        padding: 12,
+        backgroundColor:"#06454d",
+        marginBottom: 16,
+        marginTop: 16
+    },
+    BotaoFechar:{
+        fontSize: 24,        
+        textAlign: "right",
+        marginRight: 48,
         marginBottom: 4
     }
 });

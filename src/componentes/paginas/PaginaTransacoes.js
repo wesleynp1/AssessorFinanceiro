@@ -21,42 +21,20 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
     const [filtro, setFiltro] = useState("");
     const navegador = useNavigation();
 
-
-    //Divide as transações em seções por dia
-    function categorizaTransacoes() {
-        let SecaoDia = { title: "", data: "" };
-        let transacoesCategorizadas = [];
-        transacoes.forEach(t => {
-            let dataTransacao = dateParaTexto(t.data);
-
-            if (dataTransacao != SecaoDia.title) {
-                SecaoDia = { title: dataTransacao, data: [t] };
-                if (SecaoDia.title != "") transacoesCategorizadas.push(SecaoDia);
-            } else {
-                SecaoDia.data.push(t);
-            }
-        });
-
-        return transacoesCategorizadas;
-    }
-
     //FILTRA AS TRANSAÇÕES DO MÊS    
     if (mesSelecionado != 13) {//ANUAL
         transacoes = transacoes.filter(t => t.data.getMonth() == mesSelecionado);
-    }
-    
+    }    
 
     //Filtra conforme busca do usuário
     if (filtro) {
         transacoes = filtrarTransacao(transacoes, filtro);
-    }  
+    }
     
     //CALCULA RECEITA DESPESA E BALANÇO
-
     let numeroBalaco = estatistica.getBalanco(transacoes);
     let balancoNegativo = numeroBalaco < 0;
 
-    //ESTILO
     const estilo = StyleSheet.create({
         Pagina: {
             flex: 1, 
@@ -66,33 +44,6 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
             fontSize: 24,
             color: "white",
             textAlign: 'center'
-        },
-        Subtitulo: {
-            fontSize: 16,
-            color: "white",
-            textAlign: 'center'
-        },
-        Texto: {
-            fontSize: 15,
-            color: "black",
-            textAlign: 'center'
-        },
-        Quadro: {
-            flex: 1,
-            margin: 5,
-            backgroundColor: "#292616",
-            borderColor: "black",
-            borderStyle: "solid",
-            borderWidth: 2,
-        },
-        DataSecao: {
-            fontSize: 15, 
-            textAlign: 'center', 
-            marginTop: 16 
-        },
-        AreaTransacoes:{
-            flex: 1, 
-            backgroundColor: "#221122" 
         },
         Receita:{ 
             flex: 1, 
@@ -137,7 +88,7 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
             borderStyle: "solid",
             borderWidth: 1
         }
-    });
+    })
         
     return (
         <View style={estilo.Pagina}>
@@ -181,26 +132,83 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
                     style={estilo.BarraPesquisa} placeholderTextColor="white"
                     placeholder="Digite uma informacao para filtrar"
                     onChangeText={t => { setFiltro(t) }} />
-            </View>
+            </View>     
 
-            <SafeAreaView style={estilo.AreaTransacoes}>
-                <Text style={estilo.Subtitulo}>Transacoes</Text>
-                <SectionList
-                    sections={categorizaTransacoes()}
-                    renderSectionHeader={({ section: { title } }) => (
-                        <Text style={estilo.DataSecao}>{title}</Text>
-                    )}
+            <AreaTransacoes transacoes={transacoes} excluirTransacao={excluirTransacao} />
 
-                    renderItem={({ item }) => (
-                        <Transacao
-                            excluirTransacao={excluirTransacao}
-                            transacao={item} />)}
-                />
-            </SafeAreaView>
         </View>
     );
 }
 
+
+export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transações"}){
+    //ESTILO
+    const estilo = StyleSheet.create({
+        Titulo: {
+            fontSize: 16,
+            color: "white",
+            textAlign: 'center'
+        },
+        Texto: {
+            fontSize: 15,
+            color: "black",
+            textAlign: 'center'
+        },
+        Quadro: {
+            flex: 1,
+            margin: 5,
+            backgroundColor: "#292616",
+            borderColor: "black",
+            borderStyle: "solid",
+            borderWidth: 2,
+        },
+        DataSecao: {
+            fontSize: 15, 
+            textAlign: 'center', 
+            marginTop: 16 
+        },
+        AreaTransacoes:{
+            flex: 1, 
+            backgroundColor: "#221122" 
+        },
+        
+    });
+
+    return(
+        <SafeAreaView style={estilo.AreaTransacoes}>
+            <Text style={estilo.Titulo}>{titulo}</Text>
+            <SectionList
+                sections={categorizaTransacoes(transacoes)}
+                renderSectionHeader={({ section: { title } }) => (
+                    <Text style={estilo.DataSecao}>{title}</Text>
+                )}
+
+                renderItem={({ item }) => (
+                    <Transacao
+                        excluirTransacao={excluirTransacao}
+                        transacao={item} />)}
+            />
+        </SafeAreaView>
+    );
+}
+
+//Divide as transações em seções por dia
+export function categorizaTransacoes(transacoes) {
+    let SecaoDia = { title: "", data: "" };
+    let transacoesCategorizadas = [];
+    transacoes.forEach(t => {
+        let dataTransacao = dateParaTexto(t.data);
+
+        if (dataTransacao != SecaoDia.title) {
+            SecaoDia = { title: dataTransacao, data: [t] };
+            if (SecaoDia.title != "") transacoesCategorizadas.push(SecaoDia);
+        } else {
+            SecaoDia.data.push(t);
+        }
+    });
+
+    return transacoesCategorizadas;
+}
 
 
 export default PaginaTransacoes
