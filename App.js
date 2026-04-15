@@ -1,4 +1,6 @@
+import React from 'react';
 import { useState } from "react";
+import { Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -15,6 +17,7 @@ import PaginaFatura from './src/componentes/paginas/PaginaFatura';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
 
+
 const STACK = createStackNavigator();
 const TAB = createBottomTabNavigator();
 
@@ -26,6 +29,10 @@ const App = function () {
   const [carregando, setCarregando] = useState(true);
   const [login, setLogin] = useState(null);
 
+  function erro(e){
+    Alert.alert("Erro na transferência entre contas",e.message);
+    setCarregando(false);
+  }
 
   function buscarSaldoTransacoes(anoTr = new Date().getFullYear()) {
     setCarregando(true);
@@ -118,8 +125,11 @@ const App = function () {
         transacoes={transacoes}
         tranferirEntreContas={(contaOrigem, contaDestino, valor) => {
           setCarregando(true);
-          conectorBancoDeDados.transferirEntreContas(contaOrigem, contaDestino, valor)
-            .then(() => { buscarSaldoTransacoes() })
+          try{
+            conectorBancoDeDados
+            .transferirEntreContas(contaOrigem, contaDestino, valor)
+            .then(buscarSaldoTransacoes,erro)
+          }catch(e){erro(e)}
         }}
       />
     )
@@ -150,18 +160,15 @@ const App = function () {
 
   if (login == null) {
     return <PaginaLogin onLogin={l => {
-      setLogin(l);
-      buscarSaldoTransacoes();
-    }
+        setLogin(l);
+        buscarSaldoTransacoes();
+      }
     } />;
   }
 
   if (carregando) return <PaginaCarregando />;
 
   return telaNavegacaoTab();
-
-  //LOGOUT ANTES DE FECHAR O APP
-  //if (login != null) auth().signOut().then(() => firebase.firestore().terminate());
 }
 
 export default App;

@@ -27,6 +27,17 @@ const conectorBancoDeDados =
     },    
 
     transferirEntreContas: async (contaDeOrigem,contaDeDestino, valor)=>{
+        let erroValor = valor == 0;
+        let erroBancos = contaDeDestino;
+
+        if (erroValor || erroBancos){
+            throw new Error(
+                "parametros incorretos:\n"+ 
+                (erroValor  ? "Valor não pode ser 0\n" : "")+
+                (erroBancos ? "Os bancos não pode ser iguais" : "")
+            );
+        }
+
         return await firestore().runTransaction(async t => {
             
             let refContaDeOrigem  = firestore().doc("usuarios/"+usuario+"/contas/"+contaDeOrigem);
@@ -172,7 +183,7 @@ const conectorBancoDeDados =
         .then( async faturas => {
 
             for(let fatura of faturas){
-                let lancamentos = (await firestore().collection("usuarios/"+usuario+"/faturas/"+fatura.id+"/lancamentos").get()).docs;
+                let lancamentos = (await firestore().collection("usuarios/"+usuario+"/faturas/"+fatura.id+"/lancamentos").orderBy("data","desc").get()).docs;
 
                 for(lancamento of lancamentos){
                     let id = lancamento.id
@@ -191,7 +202,6 @@ const conectorBancoDeDados =
         return faturas;
     },
     deletarFatura: async (id)=>{
-        console.log("deletando "+id)
         firestore().doc("usuarios/"+usuario+"/faturas/"+id).delete();
     },
     

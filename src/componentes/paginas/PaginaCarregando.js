@@ -1,3 +1,4 @@
+import React from 'react';
 import { ActivityIndicator, View,Text} from 'react-native';
 
 const PaginaCarregando = () => {

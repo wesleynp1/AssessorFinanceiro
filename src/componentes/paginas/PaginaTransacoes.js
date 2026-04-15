@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, SectionList } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -141,7 +142,7 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
 }
 
 
-export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transações"}){
+export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transações",editarTransacao}){
     //ESTILO
     const estilo = StyleSheet.create({
         Titulo: {
@@ -186,7 +187,8 @@ export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transaçõe
                 renderItem={({ item }) => (
                     <Transacao
                         excluirTransacao={excluirTransacao}
-                        transacao={item} />)}
+                        transacao={item} 
+                        editarTransacao={editarTransacao}/>)}
             />
         </SafeAreaView>
     );

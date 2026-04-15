@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React,{useState} from "react";
 import {View, Text, Button, Modal, StyleSheet, TouchableOpacity} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import CampoDinheiro from "./CampoDinheiro";

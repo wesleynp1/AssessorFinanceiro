@@ -1,3 +1,4 @@
+import React from 'react';
 import { View,Text, Alert} from "react-native";
 import FormularioTransacao from "../FormularioTransacao";
 import { inteiroParaReal } from "../CampoDinheiro";

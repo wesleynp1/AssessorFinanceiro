@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React,{useState} from "react";
 import {View, Text, FlatList, StyleSheet, Button, Modal} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {inteiroParaReal} from "../CampoDinheiro";
@@ -23,6 +23,8 @@ const PaginaContas = ({contas, tranferirEntreContas})=>{
             </View>
         )
     }
+
+    
 
     return(
         <View style={estilo.Pagina}>
