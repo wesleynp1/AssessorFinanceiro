@@ -22,7 +22,6 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
     let receitaLiquida = estatistica.getReceitaLiquida(transacoes);
     let despesaLiquida = estatistica.getDespesaLiquida(transacoes);
-    let balanco = receitaLiquida + despesaLiquida;
     
     const renderCategorias = (vc)=>{
         
@@ -38,7 +37,7 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
         )              
     }
 
-    const renderCabeçalhoCategoria = ()=>{
+    const RenderCabeçalhoCategoria = ()=>{
         return(
             <View style={estilo.Quadro}>
                 <Text style={estilo.Categorias}>Categoria</Text>
@@ -107,14 +106,14 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
 
                         <View style={{flex:1}}>
                             <Text style={estilo.Texto}>Balanco:</Text>
-                            <Text style={estilo.Texto}>{inteiroParaReal(balanco)}</Text>
+                            <Text style={estilo.Texto}>{inteiroParaReal(receitaLiquida + despesaLiquida)}</Text>
                         </View>                     
                     </View>                
             </View>
 
             <SafeAreaView style={{flex:1}}>
                 <FlatList 
-                    ListHeaderComponent={renderCabeçalhoCategoria()}
+                    ListHeaderComponent={RenderCabeçalhoCategoria}
                     data={categorias}
                     renderItem={({item})=>renderCategorias(item)}/>
             </SafeAreaView>

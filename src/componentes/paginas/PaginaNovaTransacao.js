@@ -4,7 +4,7 @@ import FormularioTransacao from "../FormularioTransacao";
 import { inteiroParaReal } from "../CampoDinheiro";
 
 const PaginaNovaTransacao = ({novaTransacao, nomeContas,eDespesa})=>{
-    let transacaoInicial = {categoria:"",
+    const transacaoInicial = {categoria:"",
                             conta: nomeContas[0],
                             data: new Date(),
                             valor:0}

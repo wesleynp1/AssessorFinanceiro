@@ -1,18 +1,19 @@
-import React,{useState} from "react";
+import React,{useState, useRef} from "react";
 import { Text,View,TextInput,StyleSheet, TouchableOpacity} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 
 import CampoDinheiro from "./CampoDinheiro";
 import {CampoData2} from "./CampoData";
+import ContasPicker from "./ContasPicker";
 
 const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     const [categoria,setCategoria] = useState(transacaoInicial.categoria);
     const [data,setData] = useState(transacaoInicial.data);
     const [conta,setConta] = useState(transacaoInicial.conta);
-    const [valor,setValor] = useState(Math.abs(transacaoInicial.valor));
+    const [valor,setValor] = useState(transacaoInicial.valor);
 
 
-    const verificarDados = (seNegativo)=>{
+    const verificarDados = ()=>{
         let categoriaOk = categoria!="";
         let valorOk = valor!=0;
         let dataOk = new Date(data)!=undefined;
@@ -22,7 +23,7 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
                 categoria:categoria.trim(),
                 data: new Date(data),
                 conta: conta,
-                valor: parseInt((eDespesa ? "-" :'')+valor)
+                valor: parseInt(valor)
             });
         }else{
             throw "PREENCHE DIREITO ESTA MERDA!!!";
@@ -38,8 +39,8 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     };
 
     //ESTILO DO COMPONENTE
-    let corPadrão = (eDespesa ? "#AA0000" :'#009900');
-    let corFonte  = (eDespesa ? 'white' :'black');
+    const corPadrão = (eDespesa ? "#AA0000" :'#009900');
+    const corFonte  = (eDespesa ? 'white' :'black');
 
     const estilo= StyleSheet.create({
         rotulos:{
@@ -54,65 +55,57 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
             borderStyle:"solid",
             borderWidth:2,
             margin:10,
-            padding: 2},
-
+            padding: 2
+        },
         botaoRegistrar:{
             backgroundColor:corPadrão,
             height:32,
             justifyContent:"center",
             alignItems:"center",
-            margin:10},
-        selecionador:{
-            backgroundColor:corPadrão,
-            color:corFonte,
-            textAlign:"center"
-        }
-
-    })
-
+            margin:10
+        }       
+    });    
     
-    let pickersContas = []
-    for(let i=0; i<contas.length;i++)
-    {
-        pickersContas.push(<Picker.Item style={estilo.selecionador} 
-                                        label={contas[i]} 
-                                        value={contas[i]} 
-                                        key={i}/>)
-    }
-
+    const refCampoDinheiro = useRef();
+    
     return(
-    <View>
-        <View style={estilo.campos}>
-            <Text style={estilo.rotulos}>conta</Text>
-            <Picker dropdownIconColor={corPadrão}
-                    selectedValue={conta}
-                    onValueChange={c =>{setConta(c)}}>            
-                {pickersContas}            
-            </Picker>
+        <View>
+            
+            <ContasPicker  
+                        contas={contas} 
+                        contaSelecionada={conta}
+                        corFonte={corFonte}  
+                        corPadrao={corPadrão}
+                        onValueChange={c => setConta(c)}/>
+
+            <TextInput  
+                        autoFocus={true}
+                        style={estilo.campos}
+                        placeholderTextColor="gray"
+                        value={categoria}
+                        placeholder="Categoria"
+                        onChangeText={setCategoria}
+                        onSubmitEditing={()=>refCampoDinheiro.current.focus()}
+                        />
+
+            <CampoDinheiro
+                        estilo={estilo.campos}
+                        valorInicial={valor}
+                        aoMudarTexto={setValor}
+                        negativo={eDespesa}
+                        referencia={refCampoDinheiro}
+                        />
+
+            <CampoData2 estilo={estilo.campos}
+                        valorInicial={data}
+                        aoMudarTexto={setData}
+                    />
+            
+            <TouchableOpacity style={estilo.botaoRegistrar} onPress={aoPressionarRegistrar}>
+                <Text>REGISTRAR</Text>
+            </TouchableOpacity>
         </View>
-
-        <TextInput  style={estilo.campos}
-                    placeholderTextColor="gray"
-                    value={categoria}
-                    placeholder="Categoria"
-                    onChangeText={setCategoria}
-                    />
-
-        <CampoDinheiro
-                    estilo={estilo.campos}
-                    valorInicial={valor}
-                    aoMudarTexto={setValor}
-                    />
-
-        <CampoData2 estilo={estilo.campos}
-                    valorInicial={data}
-                    aoMudarTexto={setData}
-                   />
-        
-        <TouchableOpacity style={estilo.botaoRegistrar} onPress={aoPressionarRegistrar}>
-            <Text>REGISTRAR</Text>
-        </TouchableOpacity>
-    </View>);
+    );
 }
 
 export default FormularioTransacao;

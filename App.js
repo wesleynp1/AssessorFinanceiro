@@ -13,7 +13,7 @@ import PaginaContas from './src/componentes/paginas/PaginaContas';
 import PaginaEstatistica from './src/componentes/paginas/PaginaEstatisticas';
 import PaginaLogin from './src/componentes/paginas/PaginaLogin';
 import PaginaCarregando from './src/componentes/paginas/PaginaCarregando';
-import PaginaFatura from './src/componentes/paginas/PaginaFatura';
+import PaginaFaturas from './src/componentes/paginas/PaginaFaturas';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
 
@@ -28,6 +28,7 @@ const App = function () {
   const [ano, setAno] = useState(new Date().getFullYear());
   const [carregando, setCarregando] = useState(true);
   const [login, setLogin] = useState(null);
+  const nomeContas = contas.map(d => d.id);
 
   function erro(e){
     Alert.alert("Erro na transferência entre contas",e.message);
@@ -86,7 +87,7 @@ const App = function () {
           conectorBancoDeDados.inserirTransacao(t)
             .then(() => { buscarSaldoTransacoes() })
         }}
-        nomeContas={contas.map(d => d.id)}
+        nomeContas={nomeContas}
         eDespesa={route.params.eDespesa}
       />
     );
@@ -101,7 +102,7 @@ const App = function () {
           conectorBancoDeDados.atualizarTransacao(t)
             .then(buscarSaldoTransacoes)
         }}
-        nomeContas={contas.map(d => d.id)}
+        nomeContas={nomeContas}
         transacaoInicial={transacaoInicial}
       />
     );
@@ -111,8 +112,8 @@ const App = function () {
   function AbaTransacoes() {
     return (
       <STACK.Navigator initialRouteName='Inicial' screenOptions={{ headerShown: false }}>
-        <STACK.Screen name='Inicial'>{IniciaPaginaTransacoes}</STACK.Screen>
-        <STACK.Screen name='PaginaNovaTransacao' component={IniciaPaginaNovaTransacoes} />
+        <STACK.Screen name='Inicial'               component={IniciaPaginaTransacoes}/>
+        <STACK.Screen name='PaginaNovaTransacao'   component={IniciaPaginaNovaTransacoes} />
         <STACK.Screen name='PaginaEditarTransacao' component={IniciaPaginaEditarTransacao} />
       </STACK.Navigator>
     );
@@ -145,14 +146,18 @@ const App = function () {
     )
   }   
 
+  function AbaCredito(){ 
+    return(<PaginaFaturas buscarSaldoTransacoes={buscarSaldoTransacoes} nomeContas={nomeContas}/>);
+  }
+
   function telaNavegacaoTab() {
     return (
       <NavigationContainer>
         <TAB.Navigator initialRouteName='transacoes' screenOptions={{ headerShown: false }}>
-          <TAB.Screen name='Transações' component={AbaTransacoes} />
-          <TAB.Screen name='Contas' component={AbaContas} />
+          <TAB.Screen name='Transações'  component={AbaTransacoes} />
+          <TAB.Screen name='Contas'      component={AbaContas} />
           <TAB.Screen name='Estatística' component={AbaEstatistica} />
-          <TAB.Screen name='Crédito' component={PaginaFatura} />
+          <TAB.Screen name='Crédito'     component={AbaCredito} />
         </TAB.Navigator>
       </NavigationContainer>
     );

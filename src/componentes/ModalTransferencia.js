@@ -54,6 +54,7 @@ const ModalTransferencia = ({contas, tranferirEntreContas, fecharModal, visivel}
                         aoMudarTexto={setValor}
                         valorInicial={valor}
                         estilo={estilo.CampoDinheiro}
+                        negativo={false}
                     />
                     
                     <TouchableOpacity style={estilo.BotaoTransferir} onPress={()=>{tranferirEntreContas(contaOrigem,contaDestino,valor)}}>

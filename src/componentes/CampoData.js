@@ -1,8 +1,19 @@
 import React,{useState} from "react";
-import {TextInput, View, Text, TouchableOpacity} from "react-native";
+import {TextInput, View, Text, TouchableOpacity, StyleSheet} from "react-native";
 import DatePicker from "react-native-date-picker";
 
 //Ideia de componente encapsulado que corrige e filtra entradas do usuário retornando o valor "data"
+
+const estiloPadrão = StyleSheet.create({
+            fontSize: 12,
+            color:"black",
+            textAlign:"center",
+            borderColor:"blue",
+            borderStyle:"solid",
+            borderWidth:2,
+            margin:10,
+            padding: 2
+        });
 
 const filtrarCaracteres = (texto)=>{ //retorna um texto apenas com numeros a partir do texto fornecido
     return  Array.from(texto)
@@ -10,7 +21,7 @@ const filtrarCaracteres = (texto)=>{ //retorna um texto apenas com numeros a par
             .join("");
 }
 
-const textoParaDate = (textoDigitado)=>{ //retorna um objeto Date a partir de um texto(DD/MM/AAAA)  
+export const textoParaDate = (textoDigitado)=>{ //retorna um objeto Date a partir de um texto(DD/MM/AAAA)  
     let textoFiltrado = filtrarCaracteres(textoDigitado);
 
     if(textoFiltrado.length>=8)
@@ -74,7 +85,7 @@ export const validarData = (data)=>{
     return anoOk && mesOk && diaOk;
 }
 
-const CampoData = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}})=> {
+const CampoData = ({aoMudarTexto, valorInicial, estilo=estiloPadrão, referencia=()=>{}})=> {
     const [valor, setValor] = useState(dateParaTexto(valorInicial));
 
     return(
@@ -94,7 +105,7 @@ const CampoData = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}})=> {
     );
 }
 
-export const CampoData2 = ({aoMudarTexto, valorInicial, estilo, referencia=()=>{}}) =>{
+export const CampoData2 = ({aoMudarTexto, valorInicial, estilo=estiloPadrão, referencia=()=>{}}) =>{
     const [valor, setValor] = useState(valorInicial);
     const [modalVisivel, setmodalVisivel] = useState(false);
 

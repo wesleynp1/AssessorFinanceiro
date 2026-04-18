@@ -1,15 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View,TextInput,StyleSheet } from "react-native";
 
-const CampoDinheiro = ({valorInicial, //valor inicial em centavos inteiros
-                        aoMudarTexto, //ação ao usuário digitar
-                        borrarAoSubmeter, // se for o último campo {true} senão {false}
-                        estilo,
-                        aoTerminarDigitar=()=>{}, //o que fazer quando o user dar submit no campo
-                        referencia=()=>{} // executa uma ação com o ref se necessário
+
+
+
+/**
+ * 
+ * @typedef {Object} props 
+ * @property {number} valorInicial - Valor inicial em inteiro centavo de real
+ * @property {(valor : number)=>{}} aoMudarTexto - Funçao de retorno em inteiro centavo de real
+ * @property {boolean} negativo - defina True se quiser que este componete retorne o valor sempre negativo
+ * @property {StyleSheet} estilo - Estilo deste componente
+ * 
+ * 
+ * @param {props} props - Propriedades do Objeto
+ */
+
+const estiloPadrao = {
+            fontSize: 12,
+            color:"black",
+            textAlign:"center",
+            borderColor:"blue",
+            borderStyle:"solid",
+            borderWidth:2,
+            margin:10,
+            padding: 2
+        };
+
+const CampoDinheiro = ({valorInicial, //
+                        aoMudarTexto, //ação ao usuário digitar                        
+                        estilo=estiloPadrao,
+                        borrarAoSubmeter=true, // se for o último campo {true} senão {false}
+                        onSubmitEditing=()=>{}, //o que fazer quando o user dar submit(enter) no campo
+                        referencia=()=>{},// executa uma ação com o ref se necessário
+                        negativo=false 
                         })=>{
 
     const [valor,setValor] = useState(inteiroParaReal(valorInicial));
+    
+    //Caso "negativo" mude
+    useEffect(()=>{
+        if((valor.includes("-") && !negativo) || (valor.includes("+") &&  negativo)){
+            aoMudarTextoOuNegativo(valor);
+        };
+    })        
+
+    function aoMudarTextoOuNegativo(t){        
+        let numero = (Math.abs(TextoParaInteiro(t))) * (negativo ? (-1) : 1);
+        setValor(inteiroParaReal(numero)); // o que usuário vai ver
+        aoMudarTexto(numero) // o que o aplicativo vai ver
+    }    
 
     return(
         <View>
@@ -18,14 +58,10 @@ const CampoDinheiro = ({valorInicial, //valor inicial em centavos inteiros
                         placeholderTextColor="gray"
                         placeholder="Digite quanto ele custa..."
                         keyboardType="number-pad"
-                        onChangeText={t=>{
-                            let numero = TextoParaInteiro(t);
-                            setValor(inteiroParaReal(numero)); // o que usuário vai ver
-                            aoMudarTexto(numero) // o que o aplicativo vai ver
-                            }}
+                        onChangeText={aoMudarTextoOuNegativo}
                         blurOnSubmit={borrarAoSubmeter}
-                        onSubmitEditing={()=>{aoTerminarDigitar()}}
-                        ref={r=>referencia(r)}
+                        onSubmitEditing={onSubmitEditing}
+                        ref={referencia}
                             />                        
         </View>
     );
@@ -41,7 +77,7 @@ export const inteiroParaReal = (numero)=>{
 
     let n = Math.abs(numero);
 
-    let rs = numero>=0 ? "R$ +" : "R$ -";
+    let rs = (numero==0 ? "R$  " : (numero>0 ? "R$ +" : "R$ -"));
 
     if(n<10) //1 algarismo
     {

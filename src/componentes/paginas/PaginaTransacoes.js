@@ -142,7 +142,7 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
 }
 
 
-export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transações",editarTransacao}){
+export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transações", editarTransacao, alteraveis=true}){
     //ESTILO
     const estilo = StyleSheet.create({
         Titulo: {
@@ -188,7 +188,9 @@ export function AreaTransacoes({transacoes,excluirTransacao, titulo="Transaçõe
                     <Transacao
                         excluirTransacao={excluirTransacao}
                         transacao={item} 
-                        editarTransacao={editarTransacao}/>)}
+                        editarTransacao={editarTransacao}
+                        alteravel={alteraveis}
+                        />)}
             />
         </SafeAreaView>
     );

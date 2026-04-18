@@ -2,6 +2,7 @@ import React from 'react';
 import { View,Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import {inteiroParaReal} from "./CampoDinheiro";
 import { useNavigation } from '@react-navigation/native';
+import { dateParaTexto } from './CampoData';
 
 //EXIBE AS INFORMAÇÕES SOBRE A TRANSAÇÃO
 
@@ -9,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
  * @param transacao : {conta : string , categoria : string, valor : number, data : Date}
  */
 
-const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
+const Transacao = ({transacao, excluirTransacao, editarTransacao, alteravel=true})=>{
 
     const navegador = useNavigation();
 
@@ -105,6 +106,8 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
             </View>
         </View>
         
+        {
+        alteravel ?
         <View style={estilo.grupoBotoes}>
             <TouchableOpacity 
                 style={estilo.botaoExcluir} 
@@ -118,6 +121,9 @@ const Transacao = ({transacao, excluirTransacao, editarTransacao})=>{
                 <Text style={estilo.TextoBotoes}>📝️</Text>
             </TouchableOpacity>            
         </View>
+        :
+        <View></View>
+        }
 
     </View>
     )

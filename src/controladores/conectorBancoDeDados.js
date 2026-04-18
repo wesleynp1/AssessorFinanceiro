@@ -28,7 +28,7 @@ const conectorBancoDeDados =
 
     transferirEntreContas: async (contaDeOrigem,contaDeDestino, valor)=>{
         let erroValor = valor == 0;
-        let erroBancos = contaDeDestino;
+        let erroBancos = contaDeOrigem == contaDeDestino;
 
         if (erroValor || erroBancos){
             throw new Error(
@@ -159,23 +159,21 @@ const conectorBancoDeDados =
 
     //CRUD FATURAS
     inserirFatura: async (novaFatura)=>{     
-        novaFatura.contaPagamento = firestore().doc("usuarios/"+usuario+"/contas/"+novaFatura.contaPagamento);
-
-        firestore()
-        .collection("usuarios/"+usuario+"/faturas")
-        .add(novaFatura)        
+        novaFatura.criadoEm = new Date();
+        firestore().collection("usuarios/"+usuario+"/faturas").add(novaFatura);       
     },
     getFaturas: async ()=>{
         let faturas = firestore()
         .collection("usuarios/"+usuario+"/faturas")
+        .orderBy("criadoEm","desc")
         .get()
         .then( query => {
                 return query.docs.map( doc => {                    
                         let fatura = doc.data(); 
                         fatura.id = doc.id;
-                        fatura.dataPagamento  = fatura.dataPagamento.toDate();
-                        fatura.contaPagamento = fatura.contaPagamento._documentPath._parts[3];
-                        fatura.lancamentos = []
+                        fatura.dataPagamento  = (fatura.dataPagamento ? fatura.dataPagamento.toDate() : null);
+                        fatura.contaPagamento = (fatura.contaPagamento ? fatura.contaPagamento._documentPath._parts[3] : null);
+                        fatura.lancamentos = [];
                         return fatura;
                     });
             }
@@ -185,7 +183,7 @@ const conectorBancoDeDados =
             for(let fatura of faturas){
                 let lancamentos = (await firestore().collection("usuarios/"+usuario+"/faturas/"+fatura.id+"/lancamentos").orderBy("data","desc").get()).docs;
 
-                for(lancamento of lancamentos){
+                for(let lancamento of lancamentos){
                     let id = lancamento.id
                     lancamento = lancamento.data();
                     lancamento.id = id;
@@ -211,6 +209,35 @@ const conectorBancoDeDados =
     },
     deletarLancamento: (id,faturaId)=>{
         return firestore().doc("usuarios/"+usuario+"/faturas/"+faturaId+"/lancamentos/"+id).delete()
+    },
+    editarLancamento(lancamentoEditado,faturaId){
+        return firestore().doc("usuarios/"+usuario+"/faturas/"+faturaId+"/lancamentos/"+lancamentoEditado.id).update(lancamentoEditado)
+    },
+    //PAGAMENTO DE FATURA E REVERSÃO
+    pagarFatura(fatura){
+        try{               
+            fatura.conta = firestore().doc("usuarios/"+usuario+"/contas/"+fatura.conta);        
+            fatura.lancamentos = fatura.lancamentos.map(l => {
+                        l.conta = fatura.conta;
+                        l.data = fatura.data;
+                        return l;
+                    });
+
+            return firestore().runTransaction(async tr =>{    
+                
+                    let saldo = (await tr.get(fatura.conta)).data().saldo;
+                    
+                    for(lancamento of fatura.lancamentos){
+                        saldo += lancamento.valor;
+                        tr.set(firestore().collection("usuarios/"+usuario+"/transacoes").doc(), lancamento);
+                    }                
+
+                    tr.update(fatura.conta,{saldo: saldo});
+                    tr.update(firestore().doc("usuarios/"+usuario+"/faturas/"+fatura.id) ,{estaPaga: true, conta: fatura.conta, dataPagamento: fatura.data})                
+            });
+        }catch(e){
+                alert("Erro:"+e);
+            }
     }
 }
 
