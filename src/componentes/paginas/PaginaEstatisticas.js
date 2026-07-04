@@ -11,17 +11,17 @@ const PaginaEstatistica = ({transacoes,ano,selecionarAno})=>{
     const [mesSelecionado,setMesSelecionado] = useState(new Date().getMonth());
     const [anoSelecionado,setAnoSelecionado] = useState(ano);
 
-    if(mesSelecionado!=13){//SE NÃO FOR O ANUAL
+    if(mesSelecionado!=12){//SE NÃO FOR O ANUAL
         transacoes = transacoes.filter(t => t.data.getMonth()==mesSelecionado);
     }
 
-    let receitaTotal = estatistica.getReceita(transacoes);
-    let despesaTotal = estatistica.getDespesa(transacoes);
+    const receitaTotal = estatistica.getReceita(transacoes);
+    const despesaTotal = estatistica.getDespesa(transacoes);
     
-    let categorias =  estatistica.getValorPorCategorias(transacoes);
+    const categorias =  estatistica.getValorPorCategorias(transacoes);
 
-    let receitaLiquida = estatistica.getReceitaLiquida(transacoes);
-    let despesaLiquida = estatistica.getDespesaLiquida(transacoes);
+    const receitaLiquida = estatistica.getReceitaLiquida(transacoes);
+    const despesaLiquida = estatistica.getDespesaLiquida(transacoes);
     
     const renderCategorias = (vc)=>{
         

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TextInput, StyleSheet} from 'react-native';
+import {View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
 const mesesDoAno = [
@@ -30,17 +30,37 @@ export const SeletorMesAno = ({aoMudarMes,aoMudarAno,mesSelecionado,anoSeleciona
 
     pickersMes.push(<Picker.Item    
                     label={"ANUAL"}
-                    value={13} 
-                    key={13}/>);
+                    value={12} 
+                    key={12}/>);
+
+    function avancarMes(){
+        if(mesSelecionado <= 11){
+            aoMudarMes(mesSelecionado+1)
+        }
+    }
+
+    function retrocederMes(){
+        if(mesSelecionado >= 1){
+            aoMudarMes(mesSelecionado-1)
+        }
+    }
 
     return (
         <View style={estilo.container}>
+            <TouchableOpacity style={estilo.setaMes} onPress={retrocederMes}>
+                <Text style={estilo.setaMesTexto}>←</Text>
+            </TouchableOpacity>
+
             <Picker 
                 onValueChange={aoMudarMes}
                 selectedValue={mesSelecionado}
                 style={estilo.mes}>
                 {pickersMes}
             </Picker>
+            
+            <TouchableOpacity style={estilo.setaMes} onPress={avancarMes}>
+                <Text style={estilo.setaMesTexto}>→</Text>
+            </TouchableOpacity>
 
             <TextInput 
                 value={anoSelecionado.toString()} 
@@ -53,7 +73,7 @@ export const SeletorMesAno = ({aoMudarMes,aoMudarAno,mesSelecionado,anoSeleciona
     );
 }
 
-let estilo = StyleSheet.create({
+const estilo = StyleSheet.create({
     container:{
         flexDirection:'row',
         justifyContent:'center'
@@ -66,5 +86,16 @@ let estilo = StyleSheet.create({
     mes:{
         width:180,
         backgroundColor:'#424242ff'
+    },
+    setaMes:{
+        borderColor:'white',
+        borderWidth:2,
+        borderStyle:"solid",
+        margin:3,
+        alignContent: "center",
+        justifyContent: "center",        
+    },
+    setaMesTexto:{
+        fontSize:20
     }
 })

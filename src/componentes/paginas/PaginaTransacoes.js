@@ -23,7 +23,7 @@ function PaginaTransacoes({ ano, selecionarAno, transacoes, excluirTransacao }) 
     const navegador = useNavigation();
 
     //FILTRA AS TRANSAÇÕES DO MÊS    
-    if (mesSelecionado != 13) {//ANUAL
+    if (mesSelecionado != 12) {//ANUAL
         transacoes = transacoes.filter(t => t.data.getMonth() == mesSelecionado);
     }    
 
