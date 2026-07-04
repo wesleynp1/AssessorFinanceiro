@@ -12,8 +12,8 @@ const PaginaContas = ({contas, tranferirEntreContas})=>{
     contas.forEach(c =>{saldoTotal+=c.saldo});
 
     let hoje = new Date();    
-    let diasRestantesAteFimDoMes = (new Date(hoje.getFullYear(),hoje.getMonth()+1,0).getDate())-hoje.getDate();
-    let saldoDiaAteFimDoMes = saldoTotal/(diasRestantesAteFimDoMes>0 ? diasRestantesAteFimDoMes : 1);
+    let diasRestantesAteFimDoMes = (new Date(hoje.getFullYear(),hoje.getMonth()+1,0).getDate()) - hoje.getDate() + 1;
+    let saldoDiaAteFimDoMes = saldoTotal/(diasRestantesAteFimDoMes > 0 ? diasRestantesAteFimDoMes : 1);
 
     let IniciaConta =  ({item}) => {
         return(

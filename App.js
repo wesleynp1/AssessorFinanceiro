@@ -16,6 +16,7 @@ import PaginaCarregando from './src/componentes/paginas/PaginaCarregando';
 import PaginaFaturas from './src/componentes/paginas/PaginaFaturas';
 
 import conectorBancoDeDados from './src/controladores/conectorBancoDeDados';
+import provedorDeCategorias from './src/controladores/provedorDeCategorias';
 
 
 const STACK = createStackNavigator();
@@ -29,6 +30,7 @@ const App = function () {
   const [carregando, setCarregando] = useState(true);
   const [login, setLogin] = useState(null);
   const nomeContas = contas.map(d => d.id);
+  const categorias = provedorDeCategorias(transacoes)
 
   function erro(e){
     Alert.alert("Erro na transferência entre contas",e.message);
@@ -82,13 +84,15 @@ const App = function () {
   function IniciaPaginaNovaTransacoes({ route }) {
     return (
       <PaginaNovaTransacao
-        novaTransacao={t => {
+        registrarNovaTransacao={t => {
           setCarregando(true);
           conectorBancoDeDados.inserirTransacao(t)
             .then(() => { buscarSaldoTransacoes() })
         }}
         nomeContas={nomeContas}
         eDespesa={route.params.eDespesa}
+        categorias={categorias}
+        ultimaContaUtilizada = {transacoes[0].conta}
       />
     );
   }
@@ -104,6 +108,7 @@ const App = function () {
         }}
         nomeContas={nomeContas}
         transacaoInicial={transacaoInicial}
+        categorias={categorias}
       />
     );
   }

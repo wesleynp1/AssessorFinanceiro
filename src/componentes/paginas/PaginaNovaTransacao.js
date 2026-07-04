@@ -3,11 +3,13 @@ import { View,Text, Alert} from "react-native";
 import FormularioTransacao from "../FormularioTransacao";
 import { inteiroParaReal } from "../CampoDinheiro";
 
-const PaginaNovaTransacao = ({novaTransacao, nomeContas,eDespesa})=>{
-    const transacaoInicial = {categoria:"",
-                            conta: nomeContas[0],
+const PaginaNovaTransacao = ({registrarNovaTransacao, nomeContas, eDespesa, categorias, ultimaContaUtilizada})=>{
+    const transacaoInicial = {categoria:categorias[0],
+                            conta: ultimaContaUtilizada,
                             data: new Date(),
                             valor:0}
+
+    console.log(ultimaContaUtilizada)
 
     const ConfirmarRegistrarTransacao = (tr)=>{
             Alert.alert(
@@ -25,7 +27,7 @@ const PaginaNovaTransacao = ({novaTransacao, nomeContas,eDespesa})=>{
                     },
                     {
                         text:"Registrar",
-                        onPress: ()=> novaTransacao(tr)
+                        onPress: ()=> registrarNovaTransacao(tr)
                     }
                 ]
                 );
@@ -42,7 +44,8 @@ const PaginaNovaTransacao = ({novaTransacao, nomeContas,eDespesa})=>{
             transacaoInicial={transacaoInicial} 
             contas={nomeContas}
             eDespesa={eDespesa}
-            aoSubmeter={tr=>{ConfirmarRegistrarTransacao(tr)}}/>
+            aoSubmeter={tr=>{ConfirmarRegistrarTransacao(tr)}}
+            categorias={categorias}/>
         </View>
     );
 }

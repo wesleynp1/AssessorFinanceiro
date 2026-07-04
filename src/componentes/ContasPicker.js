@@ -18,11 +18,7 @@ function ContasPicker({contas, onValueChange, contaSelecionada, corPadrao="blue"
             fontSize: 12,
             color:"black",
             textAlign:"center",
-            borderColor:corPadrao,
-            borderStyle:"solid",
-            borderWidth:2,
             margin:10,
-            padding: 2
         }
     });
 
@@ -37,7 +33,7 @@ function ContasPicker({contas, onValueChange, contaSelecionada, corPadrao="blue"
 
     return(
     <View style={estilo.campos}>
-        <Text style={estilo.rotulos}>conta</Text>
+        <Text style={estilo.rotulos}>Conta</Text>
         <Picker dropdownIconColor={corPadrao}
                 selectedValue={contaSelecionada}
                 onValueChange={onValueChange}>            

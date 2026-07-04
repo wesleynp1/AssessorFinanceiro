@@ -108,11 +108,11 @@ function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancament
             padding: 2
         },
         BotaoAtualizar:{   
-        alignItems:"center",
-        padding: 12,
-        backgroundColor:"#0b7c8b",
-        marginBottom: 16,
-        marginTop: 16
+            alignItems:"center",
+            padding: 12,
+            backgroundColor:"#0b7c8b",
+            marginBottom: 16,
+            marginTop: 16
         }
     });
 

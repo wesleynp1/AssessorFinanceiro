@@ -6,7 +6,7 @@ import CampoDinheiro from "./CampoDinheiro";
 import {CampoData2} from "./CampoData";
 import ContasPicker from "./ContasPicker";
 
-const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
+const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas, categorias: categoriasJaUtilizadas})=>{
     const [categoria,setCategoria] = useState(transacaoInicial.categoria);
     const [data,setData] = useState(transacaoInicial.data);
     const [conta,setConta] = useState(transacaoInicial.conta);
@@ -39,31 +39,49 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
     };
 
     //ESTILO DO COMPONENTE
-    const corPadrão = (eDespesa ? "#AA0000" :'#009900');
+    const corPadrao = (eDespesa ? "#AA0000" :'#009900');
     const corFonte  = (eDespesa ? 'white' :'black');
 
     const estilo= StyleSheet.create({
         rotulos:{
             fontSize: 12,
-            color:corPadrão,
+            color:corPadrao,
+            marginLeft: 10
         },
         campos:{
             fontSize: 12,
             color:"black",
             textAlign:"center",
-            borderColor:corPadrão,
+            borderColor:corPadrao,
             borderStyle:"solid",
             borderWidth:2,
             margin:10,
             padding: 2
         },
+        campoCategoria:{
+            flex: 2
+        },
+        pickerCategoria:{
+            width: 99,
+            padding: 0,
+            margin:0,
+        },
         botaoRegistrar:{
-            backgroundColor:corPadrão,
+            backgroundColor:corPadrao,
             height:32,
             justifyContent:"center",
             alignItems:"center",
             margin:10
-        }       
+        },
+        container:{
+            flexDirection: "row",
+            justifyContent: "space-around"            
+        },
+        pickerItems:{
+            backgroundColor:corPadrao,
+            color:"white",
+            textAlign:"center"
+        }
     });    
     
     const refCampoDinheiro = useRef();
@@ -75,19 +93,48 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
                         contas={contas} 
                         contaSelecionada={conta}
                         corFonte={corFonte}  
-                        corPadrao={corPadrão}
+                        corPadrao={corPadrao}
                         onValueChange={c => setConta(c)}/>
+            
 
-            <TextInput  
-                        autoFocus={true}
-                        style={estilo.campos}
-                        placeholderTextColor="gray"
-                        value={categoria}
-                        placeholder="Categoria"
-                        onChangeText={setCategoria}
-                        onSubmitEditing={()=>refCampoDinheiro.current.focus()}
-                        />
+            <Text style={estilo.rotulos}>Categoria</Text>
+            <View style={estilo.container}>                            
+                <TextInput  
+                            autoFocus={true}
+                            style={[estilo.campos, estilo.campoCategoria]}
+                            placeholderTextColor="gray"
+                            value={categoria}
+                            placeholder="Categoria"
+                            onChangeText={setCategoria}
+                            onSubmitEditing={()=>refCampoDinheiro.current.focus()}
+                            />
+                <Picker 
+                    style={[estilo.pickerCategoria]}
+                    onValueChange={setCategoria}
+                    selectedValue="none"
+                    dropdownIconColor="transparent"
+                    >
 
+                    <Picker.Item  
+                                style={{display: "none",}}
+                                label={"🔍"}
+                                value="none"
+                                />
+
+                    {                        
+                        categoriasJaUtilizadas.map((c,index) => (
+                            <Picker.Item  
+                                style={estilo.pickerItems}
+                                label={c}
+                                value={c}
+                                key={index}
+                                />
+                        ))
+                    }
+                </Picker>
+            </View>
+
+            <Text style={estilo.rotulos}>Valor</Text>
             <CampoDinheiro
                         estilo={estilo.campos}
                         valorInicial={valor}
@@ -96,6 +143,7 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas})=>{
                         referencia={refCampoDinheiro}
                         />
 
+            <Text style={estilo.rotulos}>Data</Text>
             <CampoData2 estilo={estilo.campos}
                         valorInicial={data}
                         aoMudarTexto={setData}

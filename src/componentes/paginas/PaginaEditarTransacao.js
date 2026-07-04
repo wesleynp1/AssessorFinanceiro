@@ -5,7 +5,7 @@ import {Picker} from '@react-native-picker/picker';
 import { inteiroParaReal } from "../CampoDinheiro";
 import { useState } from "react";
 
-const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas})=>{
+const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas, categorias})=>{
     const [eDespesa,seteDespesa] = useState(transacaoInicial.valor<0 ? true : false);
 
     const aoSubmenter = (t)=>{
@@ -55,7 +55,8 @@ const PaginaEditarTransacao = ({atualizarTransacao,transacaoInicial, nomeContas}
             <FormularioTransacao    transacaoInicial={transacaoInicial} 
                                     contas={nomeContas}
                                     eDespesa={eDespesa}
-                                    aoSubmeter={ConfirmarEditarTransacao}/>
+                                    aoSubmeter={ConfirmarEditarTransacao}
+                                    categorias={categorias}/>
         </View>
     );
 }
