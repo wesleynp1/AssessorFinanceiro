@@ -1,12 +1,14 @@
 import React from 'react';
 import { useState, useRef } from "react";
 import { View, Text, Alert, TouchableOpacity, StyleSheet, Modal, TextInput, Button, ActivityIndicator } from "react-native";
+import {Picker} from '@react-native-picker/picker';
+
 import conectorBancoDeDados from '../controladores/conectorBancoDeDados';
 import {CampoData2} from "./CampoData";
 import CampoDinheiro from "../componentes/CampoDinheiro";
 import { valoresDefaultLancamento } from './paginas/PaginaFaturas';
 
-function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancamento}){
+function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancamento, categorias: categoriasJaUtilizadas}){
 
     const [valor,setValor] = useState(Math.abs(lancamento.valor));
     const [categoria,setCategoria] = useState(lancamento.categoria);
@@ -85,19 +87,19 @@ function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancament
             textAlign:'center',
             marginBottom: 4
         },
-        Picker: {
+        picker: {
             width:180,
             alignSelf:"center",
             backgroundColor:'#808000',
             marginBottom: 4
         },
-        BotaoFechar:{
+        botaoFechar:{
             fontSize: 24,        
             textAlign: "right",
             marginRight: 48,
             marginBottom: 4
         },
-        campos:{
+        campos:{            
             fontSize: 12,
             color:"white",
             textAlign:"center",
@@ -107,12 +109,19 @@ function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancament
             margin:10,
             padding: 2
         },
-        BotaoAtualizar:{   
+        botaoAtualizar:{   
             alignItems:"center",
             padding: 12,
             backgroundColor:"#0b7c8b",
             marginBottom: 16,
             marginTop: 16
+        },
+        picker:{
+            flex:11,
+        },
+        categoriaInput:{
+            flex:20, 
+            margin:0, 
         }
     });
 
@@ -137,19 +146,46 @@ function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancament
                     onShow={()=>refCampoCategoria.current.focus()}
                     >
                         <View style={estilo.Modal}>
-                            <Text style={estilo.BotaoFechar} onPress={fecharModal}>X</Text>
+                            <Text style={estilo.botaoFechar} onPress={fecharModal}>X</Text>
                             <View style={estilo.Formulario}>
                                 <Text style={estilo.Titulo}>Edite as informações do lancamento</Text>
 
-                                <TextInput  
-                                    style={estilo.campos}
-                                    placeholderTextColor="gray"
-                                    value={categoria}
-                                    placeholder="Categoria"
-                                    onChangeText={setCategoria}
-                                    onSubmitEditing={()=> {refCampoDinheiro.current.focus()}}
-                                    ref={refCampoCategoria}
-                                />
+                                <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+
+                                    <TextInput  
+                                        style={[estilo.campos,estilo.categoriaInput]}
+                                        placeholderTextColor="gray"
+                                        value={categoria}
+                                        placeholder="Categoria"
+                                        onChangeText={setCategoria}
+                                        onSubmitEditing={()=> {refCampoDinheiro.current.focus()}}
+                                        ref={refCampoCategoria}
+                                    />
+
+                                    <Picker 
+                                        style={estilo.picker}
+                                        onValueChange={setCategoria}
+                                        selectedValue="none"
+                                        dropdownIconColor="transparent"
+                                        >
+                    
+                                        <Picker.Item  
+                                                    style={{margin:0,padding:0,fontSize:10}}
+                                                    label={"🔍"}
+                                                    value="none"
+                                                    />
+                    
+                                        {                        
+                                            categoriasJaUtilizadas.map((c,index) => (
+                                                <Picker.Item  
+                                                    label={c}
+                                                    value={c}
+                                                    key={index}
+                                                    />
+                                            ))
+                                        }
+                                    </Picker>
+                                </View>
 
                                 <CampoDinheiro
                                     estilo={estilo.campos}
@@ -165,7 +201,7 @@ function ModalLancamento({fecharModal, visivel, faturaId, buscarDados, lancament
                                                    />
                                 
                                 <TouchableOpacity 
-                                    style={estilo.BotaoAtualizar} 
+                                    style={estilo.botaoAtualizar} 
                                     onPress={aoSubmeter}
                                     >
                                     <Text>ADICIONAR</Text>

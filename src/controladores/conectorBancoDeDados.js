@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 
 //FAZ LIGAÇÃO COM O BANCO DE DADOS
 
-const usuario = "wesleynp"
+const usuario = "teste"
 
 const conectorBancoDeDados = 
 {

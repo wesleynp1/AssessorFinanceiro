@@ -9,17 +9,17 @@ import ModalLancamento from "../ModalLancamento";
 import { createStackNavigator } from '@react-navigation/stack';
 
 
-export const valoresDefaultLancamento = {valor:0, categoria:"",data: new Date(),id:null};
+export const valoresDefaultLancamento = {valor:0, categoria:"",data: new Date(), id:null};
 const STACK= createStackNavigator();
 
 
-function PaginaFaturas({buscarSaldoTransacoes, nomeContas}){
+function PaginaFaturas({buscarSaldoTransacoes, nomeContas, categorias}){
 
     const [carregando,setCarregando] = useState(true);
     const [faturas,setFaturas] = useState([]);
 
     //CONTROLE MODAL - O que está sendo visto e editado
-    const [modalAddEditarLancamentoVisible,setModalAddEditarLancamentoVisible] = useState(false);
+    const [modalFormularioLancamentoVisible,setModalFormularioLancamentoVisible] = useState(false);
     const [faturaEmEdicaoId,setFaturaEmEdicaoId] = useState(null);
     const [lancamentoEmEdicao,setlancamentoEmEdicao] = useState(valoresDefaultLancamento);
 
@@ -30,7 +30,7 @@ function PaginaFaturas({buscarSaldoTransacoes, nomeContas}){
     function novoLancamento(faturaId){
         setlancamentoEmEdicao(valoresDefaultLancamento);
         setFaturaEmEdicaoId(faturaId);
-        setModalAddEditarLancamentoVisible(true);
+        setModalFormularioLancamentoVisible(true);
     }
 
     function editarLancamento(faturaId,LancamentoId){
@@ -39,7 +39,7 @@ function PaginaFaturas({buscarSaldoTransacoes, nomeContas}){
         
         setlancamentoEmEdicao(lancamento);
         setFaturaEmEdicaoId(faturaId);
-        setModalAddEditarLancamentoVisible(true);
+        setModalFormularioLancamentoVisible(true);
     }
 
     function deletarLancamento(id,faturaId){
@@ -83,7 +83,7 @@ function PaginaFaturas({buscarSaldoTransacoes, nomeContas}){
 
     function buscarDados(){
         if(!carregando)setCarregando(true);
-        if(modalAddEditarLancamentoVisible)setModalAddEditarLancamentoVisible(false);
+        if(modalFormularioLancamentoVisible)setModalFormularioLancamentoVisible(false);
 
         conectorBancoDeDados
         .getFaturas()
@@ -138,8 +138,9 @@ function PaginaFaturas({buscarSaldoTransacoes, nomeContas}){
                     buscarDados={buscarDados}
                     lancamento={lancamentoEmEdicao}
                     faturaId={faturaEmEdicaoId}
-                    visivel={modalAddEditarLancamentoVisible}
-                    fecharModal={()=>setModalAddEditarLancamentoVisible(false)}
+                    visivel={modalFormularioLancamentoVisible}
+                    fecharModal={()=>setModalFormularioLancamentoVisible(false)}
+                    categorias={categorias}
                 />
             </View>    
         );

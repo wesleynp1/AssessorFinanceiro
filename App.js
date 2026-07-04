@@ -29,6 +29,7 @@ const App = function () {
   const [ano, setAno] = useState(new Date().getFullYear());
   const [carregando, setCarregando] = useState(true);
   const [login, setLogin] = useState(null);
+  
   const nomeContas = contas.map(d => d.id);
   const categorias = provedorDeCategorias(transacoes)
 
@@ -152,7 +153,13 @@ const App = function () {
   }   
 
   function AbaCredito(){ 
-    return(<PaginaFaturas buscarSaldoTransacoes={buscarSaldoTransacoes} nomeContas={nomeContas}/>);
+    return(
+      <PaginaFaturas 
+        buscarSaldoTransacoes={buscarSaldoTransacoes} 
+        nomeContas={nomeContas}
+        categorias={categorias}
+      />
+  );
   }
 
   function telaNavegacaoTab() {
