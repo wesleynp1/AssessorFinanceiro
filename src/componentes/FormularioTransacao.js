@@ -100,7 +100,6 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas, cate
             <Text style={estilo.rotulos}>Categoria</Text>
             <View style={estilo.container}>                            
                 <TextInput  
-                            autoFocus={true}
                             style={[estilo.campos, estilo.campoCategoria]}
                             placeholderTextColor="gray"
                             value={categoria}
@@ -136,6 +135,7 @@ const FormularioTransacao = ({transacaoInicial,aoSubmeter,eDespesa, contas, cate
 
             <Text style={estilo.rotulos}>Valor</Text>
             <CampoDinheiro
+                        autoFocus={true}
                         estilo={estilo.campos}
                         valorInicial={valor}
                         aoMudarTexto={setValor}

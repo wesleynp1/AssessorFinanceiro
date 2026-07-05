@@ -33,7 +33,8 @@ const CampoDinheiro = ({valorInicial, //
                         borrarAoSubmeter=true, // se for o último campo {true} senão {false}
                         onSubmitEditing=()=>{}, //o que fazer quando o user dar submit(enter) no campo
                         referencia=()=>{},// executa uma ação com o ref se necessário
-                        negativo=false 
+                        negativo=false,
+                        autoFocus=false
                         })=>{
 
     const [valor,setValor] = useState(inteiroParaReal(valorInicial));
@@ -53,7 +54,9 @@ const CampoDinheiro = ({valorInicial, //
 
     return(
         <View>
-            <TextInput  style={estilo} 
+            <TextInput  
+                        autoFocus={true}
+                        style={estilo} 
                         value={valor}
                         placeholderTextColor="gray"
                         placeholder="Digite quanto ele custa..."
